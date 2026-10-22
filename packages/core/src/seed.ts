@@ -26,7 +26,7 @@ export function seedVault(): VaultItem[] {
     { id: 'v_asthma', key: 'condition_asthma', label: 'Asthma', category: 'health.condition', value: 'Asthma (moderate persistent)', sensitivity: 4, keywords: ['asthma', 'asthmatic'], ...base },
     { id: 'v_albuterol', key: 'med_albuterol', label: 'Rescue inhaler', category: 'health.medication', value: 'Albuterol HFA inhaler (ProAir)', sensitivity: 4, keywords: ['albuterol', 'proair', 'ventolin', 'salbutamol'], ...base },
     { id: 'v_flovent', key: 'med_fluticasone', label: 'Controller inhaler', category: 'health.medication', value: 'Fluticasone 110 mcg (Flovent HFA)', sensitivity: 4, keywords: ['fluticasone', 'flovent'], ...base },
-    { id: 'v_sertraline', key: 'med_sertraline', label: 'Anxiety medication', category: 'health.mental', value: 'Sertraline 50 mg (anxiety)', sensitivity: 5, keywords: ['sertraline', 'zoloft'], ...base },
+    { id: 'v_sertraline', key: 'rx_private', label: 'Anxiety medication', category: 'health.mental', value: 'Sertraline 50 mg (anxiety)', sensitivity: 5, keywords: ['sertraline', 'zoloft'], ...base },
     { id: 'v_peanut', key: 'allergy_peanut', label: 'Food allergy', category: 'health.allergy', value: 'Severe peanut allergy (carries EpiPen)', sensitivity: 3, keywords: ['peanut allergy', 'nut allergy', 'epipen'], meta: { dietary: 'Peanut-free meal required' }, ...base },
     { id: 'v_vin', key: 'car_vin', label: 'Car VIN (2003 Honda Accord)', category: 'vehicle.vin', value: '1HGCM82633A004352', sensitivity: 2, ...base },
     { id: 'v_employer', key: 'employer', label: 'Employer', category: 'identity.employment', value: 'Lumen Health, Inc.', sensitivity: 2, keywords: ['lumen health'], ...base },

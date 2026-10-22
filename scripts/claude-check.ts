@@ -28,6 +28,7 @@ const FORBIDDEN: [string, string][] = [
   ['card', '4242 4242'],
   ['card (digits)', '4242424242424242'],
   ['anxiety medication', 'Sertraline'],
+  ['mental-health condition', 'anxiety'],
   ['employer', 'Lumen Health'],
   ['VIN', raw('car_vin')],
 ];

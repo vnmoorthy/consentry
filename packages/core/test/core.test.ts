@@ -125,7 +125,7 @@ describe('firewall egress', () => {
 
   it('blocks a call when a required field is withheld by a hard rule', async () => {
     const tool = getTool('drug_recalls')!;
-    const res = await inspectEgress({ id: 'c3', tool: 'drug_recalls', recipientId: 'openfda', purpose: 'safety', origin: 'agent', args: { drug: '{{vault:med_sertraline}}' } }, tool, R('openfda'), deps());
+    const res = await inspectEgress({ id: 'c3', tool: 'drug_recalls', recipientId: 'openfda', purpose: 'safety', origin: 'agent', args: { drug: '{{vault:rx_private}}' } }, tool, R('openfda'), deps());
     expect(res.verdict).toBe('blocked');
     expect(res.blockedReason).toMatch(/Mental-health/);
   });

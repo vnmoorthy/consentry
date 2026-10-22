@@ -356,15 +356,15 @@ export class ConsentryRuntime {
     const lines: string[] = [];
     for (const item of this.state.vault) {
       const d = evaluate(this.state.policies, { category: item.category, recipient: llm, purpose: 'reasoning' });
-      if (d.effect === 'deny' || d.effect === 'ask') {
-        lines.push(`${item.label}: exists but is never available to you (token {{vault:${item.key}}} will always be withheld)`);
-        continue;
-      }
+      // Items the model may never see are left out entirely: even a label or token name can leak
+      // (a token named after a drug reveals the medication without its value).
+      if (d.effect === 'deny' || d.effect === 'ask') continue;
       if (d.effect === 'allow') lines.push(`${item.label}: ${item.value} (token {{vault:${item.key}}})`);
       else lines.push(`${item.label}: use token {{vault:${item.key}}}`);
     }
     const home = this.state.vault.find((v) => v.key === 'home_address');
     if (home?.meta?.city) lines.push(`Home city (approximate, shareable): ${home.meta.city}, ${home.meta.state}`);
+    lines.push('Some categories (government IDs, credentials, mental-health information) are always withheld from you by policy. Never ask for them.');
     return lines;
   }
 
