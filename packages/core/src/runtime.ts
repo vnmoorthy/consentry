@@ -111,6 +111,17 @@ export class ConsentryRuntime {
   }
 
   private emit(e: RuntimeEvent) {
+    // Streaming drafts are high-frequency and ephemeral: deliver them, but don't let them evict history.
+    if (e.type === 'agent.draft') {
+      for (const l of this.listeners) {
+        try {
+          l(e);
+        } catch {
+          /* ignore */
+        }
+      }
+      return;
+    }
     this.recentEvents.push(e);
     if (this.recentEvents.length > MAX_EVENTS) this.recentEvents.splice(0, this.recentEvents.length - MAX_EVENTS);
     const runId = (e as any).runId as string | undefined;
@@ -466,6 +477,25 @@ export class ConsentryRuntime {
       tools: ALL_TOOLS.filter((t) => !this.state.disabledTools.includes(t.name) && t.name !== 'insurance_quote'),
       browser: !!this.opts.browser,
       step: (t) => this.emit({ type: 'agent.step', runId, text: t, ts: Date.now() }),
+      onDraft: (() => {
+        let last = 0;
+        let timer: ReturnType<typeof setTimeout> | null = null;
+        let pending = '';
+        const flush = () => {
+          timer = null;
+          last = Date.now();
+          this.emit({ type: 'agent.draft', runId, text: this.detokenize(pending), ts: last });
+        };
+        return (text: string) => {
+          pending = text;
+          if (text === '') {
+            if (timer) clearTimeout(timer);
+            return flush();
+          }
+          if (timer) return;
+          timer = setTimeout(flush, Math.max(0, 70 - (Date.now() - last)));
+        };
+      })(),
       callTool: async (name, input) => {
         const o = await callTool(name, input);
         const report = {

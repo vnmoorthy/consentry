@@ -23,6 +23,8 @@ export interface RunView {
   calls: CallView[];
   llm?: { original: string; sanitized: string; decisions: FieldDecision[] };
   message?: string;
+  /** Live streaming text from Claude, before the final answer lands. */
+  draft?: string;
   receipt?: Receipt;
   status: 'running' | 'done';
   startedAt: number;
@@ -155,8 +157,11 @@ export const useApp = create<AppState>((set, get) => {
           feed: get().feed.map((f) => (f.kind === 'consent' && f.request.id === e.id ? { ...f, decision: e.decision } : f)),
         });
         break;
+      case 'agent.draft':
+        patchRun(e.runId, (r) => ({ ...r, draft: e.text }));
+        break;
       case 'agent.message':
-        patchRun(e.runId, (r) => ({ ...r, message: e.text }));
+        patchRun(e.runId, (r) => ({ ...r, message: e.text, draft: undefined }));
         if (!replaying) set({ chat: [...get().chat, { id: nid('m'), role: 'assistant', text: e.text, runId: e.runId, ts: e.ts }] });
         break;
       case 'run.end':
@@ -249,7 +254,7 @@ export const useApp = create<AppState>((set, get) => {
     toast(t) {
       const id = nid('t');
       set({ toasts: [...get().toasts, { ...t, id }].slice(-4) });
-      setTimeout(() => get().dismissToast(id), 4800);
+      setTimeout(() => get().dismissToast(id), t.tone === 'bad' ? 4200 : 3200);
     },
     dismissToast(id) {
       set({ toasts: get().toasts.filter((t) => t.id !== id) });

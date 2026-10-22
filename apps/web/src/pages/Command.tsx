@@ -146,6 +146,13 @@ function AssistantTurn({ text, runId, ts }: { text?: string; runId?: string; ts?
   const [modelView, setModelView] = useState(false);
   const running = run?.status === 'running';
   const fresh = !!ts && Date.now() - ts < 4000;
+  const [, tick] = useState(0);
+  useEffect(() => {
+    if (!running) return;
+    const t = setInterval(() => tick((x) => x + 1), 1000);
+    return () => clearInterval(t);
+  }, [running]);
+  const elapsed = run ? Math.max(0, Math.floor((Date.now() - run.startedAt) / 1000)) : 0;
   useEffect(() => {
     if (run?.status === 'done' && text) {
       const t = setTimeout(() => setOpen(false), 1400);
@@ -192,10 +199,18 @@ function AssistantTurn({ text, runId, ts }: { text?: string; runId?: string; ts?
             )}
             <AnimatePresence>{modelView && run && <ModelView run={run} onClose={() => setModelView(false)} />}</AnimatePresence>
           </motion.div>
+        ) : running && run?.draft ? (
+          <div className="rounded-2xl rounded-tl-md border border-white/[0.07] bg-white/[0.03] px-4 py-3">
+            <Markdown text={run.draft + ' ▍'} />
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] text-violet-200/80">
+              <Bot size={11} /> Claude is writing. Your real values are filled in on this device.
+            </div>
+          </div>
         ) : (
           running && (
             <div className={clsx('flex items-center gap-2 text-[12.5px]', waiting ? 'text-sky-300' : 'text-ink-300')}>
-              {waiting ? <Hand size={14} /> : <Spinner />} {waiting ? 'Waiting for your consent…' : 'Working through the firewall…'}
+              {waiting ? <Hand size={14} /> : <Spinner />} {waiting ? 'Waiting for your consent…' : run?.agent === 'claude' ? 'Claude is thinking. It only sees tokens…' : 'Working through the firewall…'}
+              {!waiting && elapsed > 1 && <span className="font-mono text-[11px] text-ink-500">{elapsed}s</span>}
             </div>
           )
         )}

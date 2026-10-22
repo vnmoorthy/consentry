@@ -43,12 +43,30 @@ Turn **Hostile partners** off again afterwards.
 
 If Claude can't be reached (bad key, rate limit, overloaded API, no Wi-Fi), the run doesn't fail. The trace shows *"⚠️ Claude unavailable (reason) — falling back to on-device Autopilot"* and Autopilot answers. Red-team scenarios always run on Autopilot so they're deterministic on stage.
 
-## 5 · Speed vs. capability
+## 5 · Rehearsal results (measured)
 
-| Model | When to use |
+`pnpm tsx scripts/rehearse.ts` drives the real tour panel through all 12 chapters with Claude as the brain, answers consent prompts the way a presenter would, and times everything. Last run: **12/12 chapters, 0 console errors**, about 2 minutes of machine time against an 8½-minute talk track.
+
+| Chapter | Claude run | Talk time |
+|---|---|---|
+| Real public data (hike) | 14–24 s | 45 s |
+| Consent (safety sweep) | 14–30 s | 60 s |
+| Partners (dinner) | 13–17 s | 50 s |
+| Ride home | 8–14 s | 30 s |
+| Claude as the brain | 10–12 s | 40 s |
+
+The ranges reflect network variance across runs. Read the talking point while the agent works: every run lands before you finish. Answers stream into the chat as Claude writes them, a live timer shows while it thinks, and prompt caching (~4.5–5.5k cached tokens per turn) keeps later turns quick.
+
+## 6 · Speed vs. capability
+
+Measured on the hike, dinner and safety-sweep scenarios (effort `low`):
+
+| Model | Avg per scenario |
 |---|---|
-| `claude-opus-5-5` (default) | Best planning; effort `low` keeps it snappy |
-| `claude-sonnet-5-5` | Faster turns, still strong tool use |
-| `claude-haiku-5-5` | Fastest and cheapest, for a tight demo slot |
+| `claude-opus-5-5` (default) | 14.7 s |
+| `claude-sonnet-5-5` | 12.4 s |
+| `claude-haiku-5-5` | 8.7 s |
+
+Re-run it yourself with `pnpm tsx scripts/model-bench.ts`.
 
 Switch live in **Settings** (model and effort), or pin them in `.env` with `CONSENTRY_MODEL` / `CONSENTRY_EFFORT`. `CONSENTRY_AGENT=autopilot` forces the on-device brain even when a key is present.

@@ -353,6 +353,7 @@ export type RuntimeEvent =
   | { type: 'consent.request'; request: ConsentRequest; ts: number }
   | { type: 'consent.resolved'; id: string; decision: ConsentDecision; ts: number }
   | { type: 'agent.message'; runId: string; text: string; ts: number }
+  | { type: 'agent.draft'; runId: string; text: string; ts: number }
   | { type: 'run.end'; runId: string; receipt: Receipt; ts: number }
   | { type: 'ledger.append'; entry: LedgerEntry; ts: number }
   | { type: 'state.changed'; scope: 'vault' | 'policies' | 'recipients' | 'tools' | 'settings' | 'ledger' | 'all'; ts: number };

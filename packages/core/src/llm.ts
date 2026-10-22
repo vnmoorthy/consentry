@@ -11,6 +11,8 @@ export interface ClaudeEnv {
   tools: ToolDef[];
   browser: boolean;
   step(text: string): void;
+  /** Live text of the turn being generated ("" clears it). */
+  onDraft?(text: string): void;
   /** Runs the tool through the firewall and returns model-safe (tokenized) JSON. */
   callTool(name: string, input: Record<string, unknown>): Promise<{ content: string; isError: boolean }>;
 }
@@ -52,17 +54,32 @@ export async function runClaude(env: ClaudeEnv): Promise<string> {
   const tools = env.tools.map((t) => ({ name: t.name, description: `${t.description} [Recipient: ${t.recipientId}; purpose: ${t.purpose}]`, input_schema: t.inputSchema as any }));
   const messages: any[] = [...normalizeHistory(env.history), { role: 'user', content: env.prompt }];
 
+  // Stream every turn so the answer appears as it's written; cache the growing prefix (tools → system →
+  // history) so each later turn in the loop starts faster.
+  const streamTurn = async (withFallbacks: boolean) => {
+    const base: any = { model: env.model, max_tokens: 8000, system: env.system, tools, messages, output_config: { effort: env.effort }, cache_control: { type: 'ephemeral' } };
+    const params = withFallbacks ? { ...base, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' } : base;
+    const stream: any = client.beta.messages.stream(params);
+    let draft = '';
+    for await (const ev of stream) {
+      if (ev.type === 'content_block_delta' && ev.delta?.type === 'text_delta') {
+        draft += ev.delta.text;
+        env.onDraft?.(draft);
+      }
+    }
+    return stream.finalMessage();
+  };
   const create = async () => {
-    const base = { model: env.model, max_tokens: 8000, system: env.system, tools, messages, output_config: { effort: env.effort } };
     if (fallbacksSupported) {
       try {
-        return await client.beta.messages.create({ ...base, betas: ['server-side-fallback-2026-07-01'], fallbacks: 'default' } as any);
+        return await streamTurn(true);
       } catch (err: any) {
         if (err?.status !== 400 || !/fallback|beta/i.test(String(err?.message))) throw err;
         fallbacksSupported = false;
+        env.onDraft?.('');
       }
     }
-    return client.messages.create(base as any);
+    return streamTurn(false);
   };
 
   for (let turn = 0; turn < MAX_TURNS; turn++) {
@@ -74,6 +91,10 @@ export async function runClaude(env: ClaudeEnv): Promise<string> {
       throw new ClaudeUnavailable(friendly(err));
     }
     if (turn === 0) env.step(`Claude planned in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
+    if ((globalThis as any).process?.env?.CONSENTRY_DEBUG_LLM) {
+      const u = response.usage ?? {};
+      console.log(`[claude] turn ${turn + 1} ${((Date.now() - t0) / 1000).toFixed(1)}s in=${u.input_tokens} cache_read=${u.cache_read_input_tokens ?? 0} cache_write=${u.cache_creation_input_tokens ?? 0} out=${u.output_tokens} stop=${response.stop_reason}`);
+    }
 
     if (response.stop_reason === 'refusal') return "I can't help with that request.";
     // Keep the full content (including thinking blocks) so the conversation stays valid.
@@ -85,6 +106,8 @@ export async function runClaude(env: ClaudeEnv): Promise<string> {
       return response.content.filter((b: any) => b.type === 'text').map((b: any) => b.text).join('\n').trim() || '(no answer)';
     }
 
+    // Text before a tool call is a progress note, not the answer: move it into the trace.
+    env.onDraft?.('');
     const pre = response.content.filter((b: any) => b.type === 'text').map((b: any) => b.text).join(' ').trim();
     if (pre) env.step(pre.length > 180 ? pre.slice(0, 177) + '…' : pre);
 
@@ -119,6 +142,6 @@ export function buildSystemPrompt(profileLines: string[], now: Date): string {
     'USER PROFILE (as permitted by policy):',
     ...profileLines.map((l) => '- ' + l),
     '',
-    'STYLE: Be concise and concrete. Use short markdown with bold headline, bullets and real numbers from tools. End with one line starting "🔒" that says what data left the device (Consentry reports each call to you in tool results under "_consentry").',
+    'STYLE: Keep answers to about 120 words: a bold one-line headline, then at most 5 short bullets with real numbers from the tools, then one line starting "🔒" that says what data left the device (Consentry reports each call to you in tool results under "_consentry"). No headings or tables unless asked. Do not narrate what you are about to do before calling tools.',
   ].join('\n');
 }

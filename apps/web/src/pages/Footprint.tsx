@@ -242,6 +242,20 @@ function Drawer({ row, onClose, onRequest }: { row: FootprintRow | null; onClose
                 </div>
               ))}
             </div>
+            <div className="mt-5 rounded-2xl border border-mint/25 bg-mint/[0.05] p-4">
+              {row.tier === 'partner' ? (
+                <>
+                  <div className="text-[13px] font-semibold text-white">Make them forget you</div>
+                  <p className="mt-1 text-[12px] text-ink-400">Consentry drafts a CCPA/GDPR deletion request listing exactly what {row.name} received, with your ledger entries as evidence.</p>
+                  <button className="btn btn-primary mt-3" onClick={() => onRequest(row)}>
+                    <FileX2 size={14} /> {row.request ? 'View deletion request' : 'Request deletion'}
+                  </button>
+                </>
+              ) : row.tier === 'llm' ? (
+                <p className="text-[12px] text-ink-400">The model provider only ever received tokens and the health context your policy allows. Retention follows your Anthropic org settings.</p>
+              ) : (
+                <p className="text-[12px] text-ink-400">{row.name} is an account-less public API. It received only coarsened, non-identifying queries, so there is no profile to delete.</p>
+              )}
             <div className="mt-5 space-y-4">
               {Object.entries(row.cells).map(([g, c]) => (
                 <div key={g}>
@@ -262,20 +276,6 @@ function Drawer({ row, onClose, onRequest }: { row: FootprintRow | null; onClose
                 </div>
               ))}
             </div>
-            <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-              {row.tier === 'partner' ? (
-                <>
-                  <div className="text-[13px] font-semibold text-white">Make them forget you</div>
-                  <p className="mt-1 text-[12px] text-ink-400">Consentry drafts a CCPA/GDPR deletion request listing exactly what {row.name} received, with your ledger entries as evidence.</p>
-                  <button className="btn btn-primary mt-3" onClick={() => onRequest(row)}>
-                    <FileX2 size={14} /> {row.request ? 'View deletion request' : 'Request deletion'}
-                  </button>
-                </>
-              ) : row.tier === 'llm' ? (
-                <p className="text-[12px] text-ink-400">The model provider only ever received tokens and the health context your policy allows. Retention follows your Anthropic org settings.</p>
-              ) : (
-                <p className="text-[12px] text-ink-400">{row.name} is an account-less public API. It received only coarsened, non-identifying queries, so there is no profile to delete.</p>
-              )}
             </div>
           </motion.aside>
         </motion.div>

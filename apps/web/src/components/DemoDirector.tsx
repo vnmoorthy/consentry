@@ -10,6 +10,8 @@ export interface Chapter {
   path: string;
   seconds: number;
   say: string;
+  /** Alternative talking point when Claude is the brain (where the behaviour differs). */
+  sayClaude?: string;
   do?: string;
   prompt?: string;
   click?: string;
@@ -20,8 +22,8 @@ export interface Chapter {
 
 export const CHAPTERS: Chapter[] = [
   { title: 'Meet Maya', path: '/vault', seconds: 35, highlight: 'vault-banner', say: 'This is Maya’s vault: 15 pieces of personal data, from her SSN and card to her asthma and anxiety meds. It is encrypted at rest. Her agent never sees these values, only tokens like {{vault:home_location}}.', do: 'Click the eye on “Social Security Number” to reveal it locally, then hide it.' },
-  { title: 'Real public data, zero PII', path: '/', seconds: 45, prompt: 'Is Saturday good for a hike in Yosemite with my asthma?', highlight: 'feed', say: 'Twelve live public APIs: Open-Meteo, the National Weather Service, USGS, NHTSA, openFDA, OpenFEMA. Watch the feed: every call is CLEAN. The asthma reasoning and the distance from home are computed on-device.' },
-  { title: 'Consent that means something', path: '/', seconds: 60, prompt: 'Do a safety sweep: has anything I own or take been recalled?', say: 'The VIN goes to NHTSA automatically, because that’s my rule. Medications need my OK: exact vs. minimized, side by side. I’ll choose 30 days, and that grant covers the second inhaler. My anxiety medication never leaves, because that’s a hard line.', do: 'In the consent prompt press 3 (30 days).' },
+  { title: 'Real public data, zero PII', path: '/', seconds: 45, prompt: 'Is Saturday good for a hike in Yosemite with my asthma?', highlight: 'feed', say: 'Twelve live public APIs: Open-Meteo, the National Weather Service, USGS, NHTSA, openFDA, OpenFEMA. Watch the feed: every call is CLEAN. The asthma reasoning and the distance from home are computed on-device.', sayClaude: 'Claude plans the calls against twelve live public APIs: Open-Meteo, the National Weather Service, USGS, NHTSA, openFDA. Watch the feed: every call is CLEAN, because the APIs only saw park coordinates. Claude can reason about my asthma because my policy allows it, but it has never seen my name or address.' },
+  { title: 'Consent that means something', path: '/', seconds: 60, prompt: 'Do a safety sweep: has anything I own or take been recalled?', say: 'The VIN goes to NHTSA automatically, because that’s my rule. Medications need my OK: exact vs. minimized, side by side. I’ll choose 30 days, and that grant covers the second inhaler. My anxiety medication never leaves, because that’s a hard line.', sayClaude: 'Claude asks NHTSA about my car with the VIN, as my rule allows. Medications need my OK: exact vs. minimized, side by side. I’ll choose 30 days, and that grant covers the second inhaler. My anxiety medication is a hard line. Claude doesn’t even know it exists.', do: 'In the consent prompt press 3 (30 days).' },
   { title: 'Partners get the least', path: '/', seconds: 50, prompt: 'Book a vegetarian dinner for 2 tonight at 7:30', highlight: 'flowmap', say: 'BiteFinder only gets my neighborhood. TableTap gets my real name, but a relay phone, a relay email and a single-use card. My allergy goes out as “peanut-free meal required”, not a diagnosis.', do: 'Press 1 (Share minimized), then read “What TableTap now has on file”.' },
   { title: 'Exact address? Your call', path: '/', seconds: 30, prompt: 'Get me a ride home from Verdant Kitchen at 9:30 PM', say: 'RideNow wants my exact home address. I can share the nearest intersection instead, and the driver still finds me.', do: 'Press 1 to share the intersection.' },
   { title: 'A receipt for every run', path: '/', seconds: 25, receipt: true, say: 'Every run prints a privacy receipt: what left, in what form, to whom, and what was withheld, anchored to the ledger’s head hash.' },
@@ -113,6 +115,7 @@ export function DemoDirector() {
   };
   const go = (n: number) => {
     const next = Math.max(0, Math.min(chapters.length - 1, n));
+    openReceipt(null);
     setI(next);
     if (loc.pathname !== chapters[next].path) nav(chapters[next].path);
   };
@@ -132,7 +135,7 @@ export function DemoDirector() {
       </AnimatePresence>
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, y: 20, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20 }} transition={{ type: 'spring', stiffness: 340, damping: 30 }} className={clsx('fixed bottom-5 right-5 z-40 max-w-[calc(100vw-2.5rem)]', compact ? 'w-[340px]' : 'w-[380px]')}>
+          <motion.div initial={{ opacity: 0, y: 20, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 20 }} transition={{ type: 'spring', stiffness: 340, damping: 30 }} className={clsx('fixed bottom-5 right-5 z-[55] max-w-[calc(100vw-2.5rem)]', compact ? 'w-[340px]' : 'w-[380px]')}>
            <div className="ring-gradient overflow-hidden rounded-3xl bg-ink-900/95 shadow-2xl backdrop-blur-xl">
             <div className="h-1 bg-white/5">
               <motion.div className="h-full bg-gradient-to-r from-mint to-violet" animate={{ width: `${((idx + 1) / chapters.length) * 100}%` }} />
@@ -198,7 +201,7 @@ export function DemoDirector() {
                     <h3 className="mt-2 font-display text-lg font-bold leading-tight text-white">{ch.title}</h3>
                     <div className="mt-3 flex gap-2 rounded-2xl bg-white/[0.04] p-3">
                       <MessageSquareQuote size={15} className="mt-0.5 shrink-0 text-violet" />
-                      <p className="text-[12.5px] italic leading-relaxed text-ink-100">“{ch.say}”</p>
+                      <p className="text-[12.5px] italic leading-relaxed text-ink-100">“{claude && ch.sayClaude ? ch.sayClaude : ch.say}”</p>
                     </div>
                     {ch.do && (
                       <div className="mt-2 flex gap-2 px-1 text-[12px] text-ink-300">
@@ -215,10 +218,10 @@ export function DemoDirector() {
                   <button className="btn btn-ghost !px-2.5" onClick={() => go(idx - 1)} disabled={idx === 0} aria-label="Previous chapter">
                     <ChevronLeft size={16} />
                   </button>
-                  <button className="btn btn-primary flex-1 justify-center" onClick={act} disabled={!!ch.prompt && running}>
+                  <button className="btn btn-primary flex-1 justify-center" onClick={act} disabled={!!ch.prompt && running} data-tour-action>
                     <Play size={14} /> {ch.prompt && running ? 'Agent is working…' : actionLabel}
                   </button>
-                  <button className="btn btn-ghost !px-2.5" onClick={() => go(idx + 1)} disabled={idx === chapters.length - 1} aria-label="Next chapter">
+                  <button className="btn btn-ghost !px-2.5" onClick={() => go(idx + 1)} disabled={idx === chapters.length - 1} aria-label="Next chapter" data-tour-next>
                     <ChevronRight size={16} />
                   </button>
                 </div>
