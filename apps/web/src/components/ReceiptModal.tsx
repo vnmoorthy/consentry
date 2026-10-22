@@ -61,7 +61,7 @@ export function ReceiptModal() {
           <div className="font-bold">DISCLOSED ({r.shared.length})</div>
           {r.shared.length === 0 && <div className="text-[#666]">nothing</div>}
           {r.shared.map((s, i) => (
-            <Row key={i} l={`${s.label} → ${recipientName(snap, s.recipientId)}`} r={s.form === 'exact' ? 'EXACT' : s.form.replace(/ \(.*\)$/, '').slice(0, 22)} />
+            <Row key={i} l={`${s.label} → ${recipientName(snap, s.recipientId)}`} r={s.form === 'exact' ? 'EXACT' : s.form.replace(/ \([^()]*\)$/, '').slice(0, 22)} />
           ))}
           <div className="my-3 border-t border-dashed border-[#999]" />
           <div className="font-bold">WITHHELD ({r.withheld.length})</div>

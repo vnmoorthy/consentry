@@ -1,0 +1,13 @@
+{
+  "name": "consentry-deck",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "media": "ffmpeg -y -loglevel error -i ../../assets/demo.mp4 -filter_complex \"[0:v]trim=start=4.2,setpts=PTS-STARTPTS[a];[0:v]trim=end=4.2,setpts=PTS-STARTPTS[b];[a][b]concat=n=2:v=1[v];[v]fps=9,scale=960:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128:stats_mode=diff[p];[s1][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle\" media/demo.gif",
+    "build": "node build.mjs && python3 animate.py ../Consentry-pitch.pptx"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1",
+    "qrcode": "^1.5.4"
+  }
+}

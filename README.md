@@ -22,7 +22,7 @@
 **Consentry** is a consent firewall that sits between an AI agent and everything it talks to: tools, APIs, MCP servers, other companies, and even the LLM itself.<br/>
 It inspects every outbound field, minimizes what isn't needed, **asks you** when it matters, quarantines prompt injections coming back, and writes a **tamper-evident receipt** of every decision.
 
-[**Live demo**](https://vnmoorthy.github.io/consentry/) · [**Watch the 24-second demo**](assets/demo.mp4) · [**Architecture**](docs/ARCHITECTURE.md) · [**10-minute demo script**](docs/DEMO_SCRIPT.md) · [**Pitch storyboard**](docs/PITCH_STORYBOARD.md)
+[**Live demo**](https://vnmoorthy.github.io/consentry/) · [**Watch the demo video**](assets/demo.mp4) · [**Architecture**](docs/ARCHITECTURE.md) · [**10-minute demo script**](docs/DEMO_SCRIPT.md) · [**Pitch storyboard**](docs/PITCH_STORYBOARD.md)
 
 <img src="assets/demo.gif" alt="Consentry demo: booking dinner with a relay phone, relay email, single-use card and a minimized allergy note, then a recall sweep" width="100%" />
 

@@ -1,0 +1,33 @@
+# Consentry: 3-minute pitch storyboard
+
+Deck: [`deck/Consentry-pitch.pptx`](../deck/Consentry-pitch.pptx) (10 slides, Morph transitions, auto-playing builds, embedded live demo GIF). Speaker notes in the deck match this script.
+
+**Pace:** about 155 words per minute, roughly 480 spoken words in total. Trim the parenthetical clauses on slides 4 and 7 if you run long. Every build animates automatically after the slide transition, so **just press → once per slide.**
+
+| # | Time | Slide | On screen (motion) | Say (voiceover) |
+|---|---|---|---|---|
+| 1 | **0:00 – 0:15** | **Cover:** *The consent firewall for AI agents* | Fade in. The shield glows top-left; the kicker, title, subtitle and track pills rise in sequence; the product screenshot zooms in; stats tick in (12 APIs · 18 tools · 5/5). | "Every agent demo you'll see today asks you to hand over your life: your address, your card, your diagnosis. We built **Consentry**, a consent firewall for AI agents. Your agent can use the world's public data. The world can't use yours." |
+| 2 | **0:15 – 0:35** | **Problem:** *Agents now hold the keys to your life* | **Morph:** the shield shrinks into the top-right corner and the glow drifts left. Three numbered problems rise one by one; then the diagram builds: data chips, the agent node zooms in, red arrows fan out to every destination, including `telemetry-cdn.io`. | "Agents are moving from chatting to doing: booking, buying, refilling. But context is all or nothing. Whatever the agent knows, every tool it calls can learn, and so can the model provider. One poisoned web page can redirect it. Afterwards, nobody can prove what was shared." |
+| 3 | **0:35 – 0:52** | **Insight:** *Don't trust the model. Enforce at the boundary* | **Morph:** the shield grows and slides beside the headline. The "Today ✕" card rises, then the glowing "With Consentry ✓" card. | "Our principle: don't trust the model, enforce at the boundary. A model that *usually* refuses is not a control. Consentry is a single choke point. The agent only ever sees vault tokens, and every field is judged on what it is, who's receiving it, and why." |
+| 4 | **0:52 – 1:12** | **How it works:** *One choke point for every byte that leaves* | Four effect cards rise in cascade: ALLOW (green), MINIMIZE (amber), ASK (blue), DENY (red). The live flow-map screenshot zooms in. | "Four outcomes, per field. **Allow**: my VIN goes to NHTSA for recalls. **Minimize**: my exact GPS becomes a ten-kilometer grid for the weather API. **Ask**: the agent pauses and I decide. **Deny**: my SSN, real card and mental-health data never leave. Every packet on this map is a field, colored by its fate." |
+| 5 | **1:12 – 1:30** | **Minimization:** *Share the least that still gets the job done* | The table fades in; the amber call-out card zooms; the numbers 2 · 4 · 2 rise. | "Minimizers keep the task working. Phone and email become relay aliases. My card becomes a single-use, merchant-locked virtual card. My allergy becomes 'peanut-free meal required', not a diagnosis. An insurance API asked for eight fields. It got two exact, four minimized, two withheld, and still produced the quote." |
+| 6 | **1:30 – 1:48** | **Consent & proof:** *Consent you can feel. Receipts you can verify* | The consent prompt rises, then the paper receipt; four numbered points cascade in. | "When it matters, the agent stops and asks, with exact versus minimized side by side and the partner's own retention policy. Every run prints a privacy receipt, and every decision is SHA-256 hash-chained, so if anyone rewrites history, we catch it." |
+| 7 | **1:48 – 2:13** | **Live demo (Track 1):** *Real public data, flowing through the firewall* | The demo GIF zooms in and plays (consent prompt → booking → safety sweep → receipt). The API list builds in two groups. | "This is the real product, running on twelve live public APIs: the National Weather Service, USGS, NHTSA, openFDA, OpenFEMA, Open-Meteo, Wikipedia. Watch the booking: TableTap gets my name, a relay phone, a relay email and a one-time card. My allergy only goes out after I approve the minimized version. Then a recall sweep finds an active albuterol recall, and my anxiety medication is never sent at all." |
+| 8 | **2:13 – 2:33** | **Red team:** *We attacked our own agent* | "5/5" zooms in huge; five green-check attack rows rise one after another. | "We didn't just build defenses, we attacked them. A restaurant review hides instructions to send my SSN to a tracking domain, and we simulate an agent that *obeys*. Ingress quarantine catches it, the run is tainted, default-deny egress blocks the domain, and the hard lines hold. Five attacks, five contained." |
+| 9 | **2:33 – 2:45** | **Architecture:** *One TypeScript core. Runs everywhere* | The architecture diagram zooms in; five capability lines rise. | "One isomorphic TypeScript core runs in Node and in the browser. It ships as an MCP server for Claude Desktop, Claude Code and Cursor, as an HTTP gateway, and as a local-first app. The live demo has no backend at all." |
+| 10 | **2:45 – 3:00** | **Close:** *Consent management for the agent era* | Three business tiers rise left to right; the "why now" line fades; the closing line rises; the QR code zooms in. | "Privacy law already demands purpose limitation and minimization, and agents can't comply without a boundary. Our model is an open-source core, a team gateway, and enterprise policy packs. It's live and open source right now. Scan to try it. **Your data. Your rules. Your receipt.**" |
+
+## Delivery notes
+
+- **Open strong, close on the line.** Memorize slides 1 and 10 word for word. They carry the hook and the takeaway.
+- **Let the motion breathe.** Each slide's build takes about 1.5 to 2.5 seconds. Start talking as the title lands; don't wait for the last element.
+- **Point, don't read.** On slide 4, gesture at the colored packets. On slide 8, pause one beat after "obeys."
+- **If you have 10 minutes instead of 3**, swap slide 7 for the live product and follow [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+- **Likely judge questions:** "Isn't this DLP?" (no: it works per field, per recipient and per purpose, consent is in-flow, the LLM is treated as a recipient, and there are receipts) · "Paraphrased data?" (the LLM never sees raw values; a semantic classifier is on the roadmap) · "Business?" (the open-core tiers on slide 10).
+
+## Word count by slide
+
+| Slide | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Seconds | 15 | 20 | 17 | 20 | 18 | 18 | 25 | 20 | 12 | 15 |
+| Words (≈) | 38 | 48 | 46 | 58 | 52 | 44 | 68 | 50 | 34 | 42 |

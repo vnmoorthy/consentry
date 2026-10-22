@@ -154,7 +154,7 @@ export async function autopilot(prompt: string, env: AgentEnv): Promise<string> 
     const rows = [...byRecipient.entries()].map(([id, r]) => `| ${recipientName(id)} | ${r.calls} | ${[...r.shared].join(', ') || '—'} | ${[...r.minimized].join(', ') || '—'} | ${[...r.withheld].join(', ') || '—'} |`);
     const threats = env.ledger.filter((e) => e.kind === 'ingress').length;
     return [
-      `**Here's everyone who has received data from me on your behalf** (${eg.length} calls, all hash-chained in your ledger):`,
+      `**Here's everyone who has received data from me on your behalf** (${eg.length} call${eg.length === 1 ? '' : 's'}, all hash-chained in your ledger):`,
       '',
       '| Recipient | Calls | Got exact | Got minimized | Withheld |',
       '|---|---|---|---|---|',
