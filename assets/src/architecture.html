@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1600px; height: 980px; background: #05060a; font-family: Inter, sans-serif; color: #e3e7f1; position: relative; overflow: hidden; }
+  .bg { position: absolute; inset: 0; background: radial-gradient(800px 500px at 50% 45%, rgba(94,234,212,.08), transparent 60%), radial-gradient(700px 500px at 100% 100%, rgba(167,139,250,.08), transparent 60%); }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px); background-size: 28px 28px; }
+  h1 { position: absolute; left: 60px; top: 42px; font-family: 'Inter Tight'; font-size: 34px; font-weight: 800; letter-spacing: -.02em; color: #fff; }
+  h1 span { background: linear-gradient(92deg,#5eead4,#a78bfa); -webkit-background-clip: text; color: transparent; }
+  .sub { position: absolute; left: 60px; top: 88px; font-size: 15px; color: #8a93ad; }
+  .box { position: absolute; border-radius: 18px; border: 1px solid rgba(255,255,255,.1); background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); padding: 16px 18px; }
+  .box h3 { font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
+  .box .t { font-size: 11px; text-transform: uppercase; letter-spacing: .16em; color: #8a93ad; font-weight: 600; margin-bottom: 8px; }
+  .box ul { list-style: none; margin-top: 8px; }
+  .box li { font-size: 12.5px; color: #b9c0d4; padding: 3px 0; display: flex; gap: 8px; align-items: center; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+  .mono { font-family: 'JetBrains Mono'; font-size: 11.5px; color: #c4b5fd; }
+  .fw { border: 1.5px solid transparent; background: linear-gradient(#0b0d14,#0b0d14) padding-box, linear-gradient(135deg,#5eead4,#a78bfa) border-box; box-shadow: 0 30px 120px -30px rgba(94,234,212,.5); }
+  .stage { display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: start; padding: 7px 0; border-bottom: 1px dashed rgba(255,255,255,.08); }
+  .stage:last-child { border-bottom: 0; }
+  .num { width: 22px; height: 22px; border-radius: 7px; background: rgba(94,234,212,.12); color: #5eead4; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .stage b { font-size: 13px; color: #fff; }
+  .stage div div { font-size: 11.5px; color: #8a93ad; margin-top: 1px; }
+  svg.wires { position: absolute; inset: 0; }
+  .lbl { position: absolute; font-family: 'JetBrains Mono'; font-size: 11px; color: #8a93ad; background: #05060a; padding: 2px 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,.08); }
+  .legend { position: absolute; left: 60px; bottom: 36px; display: flex; gap: 22px; font-size: 12.5px; color: #b9c0d4; }
+</style>
+</head>
+<body>
+<div class="bg"></div><div class="grid"></div>
+<h1>How <span>Consentry</span> works</h1>
+<div class="sub">One choke point for every byte that leaves. It runs in the browser (local-first) or as a gateway server, from the same TypeScript core.</div>
+
+<svg class="wires" viewBox="0 0 1600 980">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5eead4"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#fb7185"/></marker>
+    <marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a78bfa"/></marker>
+  </defs>
+  <!-- agents → firewall -->
+  <path d="M370 250 C 470 250, 480 360, 590 380" stroke="#5eead4" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M370 455 C 470 455, 490 450, 590 450" stroke="#5eead4" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M370 640 C 470 640, 480 540, 590 520" stroke="#5eead4" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <!-- vault ↔ firewall -->
+  <path d="M770 790 L 770 700" stroke="#a78bfa" stroke-width="2" fill="none" stroke-dasharray="5 5" marker-end="url(#c)"/>
+  <!-- firewall → recipients -->
+  <path d="M1010 360 C 1100 360, 1110 220, 1200 215" stroke="#5eead4" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M1010 430 C 1100 430, 1120 420, 1200 415" stroke="#a78bfa" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M1010 500 C 1100 500, 1120 600, 1200 605" stroke="#fbbf24" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <path d="M1010 560 C 1090 600, 1110 760, 1200 765" stroke="#fb7185" stroke-width="2" fill="none" stroke-dasharray="6 6" marker-end="url(#b)"/>
+  <!-- responses back (ingress) -->
+  <path d="M1200 640 C 1120 660, 1090 620, 1012 600" stroke="#fb7185" stroke-width="1.6" fill="none" marker-end="url(#b)"/>
+  <!-- firewall → ledger -->
+  <path d="M940 700 C 960 780, 990 880, 1028 890" stroke="#a78bfa" stroke-width="2" fill="none" marker-end="url(#c)"/>
+</svg>
+
+<!-- Agents -->
+<div class="box" style="left:60px; top:180px; width:310px;">
+  <div class="t">Agents</div>
+  <h3>✳️ Claude agent loop</h3>
+  <ul><li><span class="dot" style="background:#a78bfa"></span>Tool use via Anthropic SDK</li><li><span class="dot" style="background:#a78bfa"></span>Sees vault <span class="mono">{{tokens}}</span> only</li></ul>
+</div>
+<div class="box" style="left:60px; top:385px; width:310px;">
+  <h3>⚙️ Autopilot (on-device)</h3>
+  <ul><li><span class="dot" style="background:#5eead4"></span>Deterministic planner, no LLM</li><li><span class="dot" style="background:#5eead4"></span>Reasons over vault locally</li></ul>
+</div>
+<div class="box" style="left:60px; top:570px; width:310px;">
+  <h3>🔌 Any MCP client / HTTP</h3>
+  <ul><li><span class="dot" style="background:#60a5fa"></span>Claude Desktop · Claude Code · Cursor</li><li><span class="dot" style="background:#60a5fa"></span><span class="mono">POST /api/gateway/call</span></li></ul>
+</div>
+
+<!-- Firewall -->
+<div class="box fw" style="left:590px; top:150px; width:420px; height:550px; padding:20px 22px;">
+  <div class="t" style="color:#5eead4">Consentry core · packages/core</div>
+  <h3 style="font-size:20px; font-family:'Inter Tight'">🛡️ Consent firewall</h3>
+  <div style="margin-top:12px">
+    <div class="stage"><span class="num">1</span><div><b>LLM egress</b><div>Prompts &amp; tool results tokenized before the model sees them</div></div></div>
+    <div class="stage"><span class="num">2</span><div><b>Detect</b><div>Vault fingerprints · tokens · regex + Luhn · health lexicon · geo-proximity</div></div></div>
+    <div class="stage"><span class="num">3</span><div><b>Decide (per field)</b><div>data type × recipient tier × purpose → allow · minimize · ask · deny</div></div></div>
+    <div class="stage"><span class="num">4</span><div><b>Consent</b><div>Agent pauses; exact vs. minimized preview; grants w/ expiry</div></div></div>
+    <div class="stage"><span class="num">5</span><div><b>Minimize</b><div>~10 km coords · neighborhood · relay alias · virtual card · age range · generic drug</div></div></div>
+    <div class="stage"><span class="num">6</span><div><b>Default-deny egress</b><div>Unverified domains never get a request; missing required field ⇒ blocked</div></div></div>
+    <div class="stage"><span class="num">7</span><div><b>Ingress quarantine</b><div>Prompt-injection &amp; exfil-URL scanner · token-smuggling guard · run taint</div></div></div>
+  </div>
+</div>
+
+<!-- Vault -->
+<div class="box" style="left:600px; top:790px; width:400px;">
+  <div class="t" style="color:#c4b5fd">Vault</div>
+  <h3>🔐 Encrypted personal data</h3>
+  <ul><li><span class="dot" style="background:#c4b5fd"></span>AES-256-GCM at rest (WebCrypto, Node &amp; browser)</li></ul>
+</div>
+
+<!-- Ledger -->
+<div class="box" style="left:1030px; top:850px; width:330px;">
+  <div class="t" style="color:#c4b5fd">Ledger</div>
+  <h3>🧾 Hash-chained receipts</h3>
+  <ul><li><span class="dot" style="background:#c4b5fd"></span>SHA-256 chain · masked fields · payload digests</li></ul>
+</div>
+
+<!-- Recipients -->
+<div class="box" style="left:1200px; top:160px; width:340px;">
+  <div class="t">Public sector · open data (real, live)</div>
+  <h3>🏛️ 12 public-data APIs</h3>
+  <ul><li><span class="dot" style="background:#38bdf8"></span>NWS · USGS · NHTSA · openFDA · OpenFEMA</li><li><span class="dot" style="background:#2dd4bf"></span>Open-Meteo (weather · air · geocoding) · Wikipedia</li></ul>
+</div>
+<div class="box" style="left:1200px; top:375px; width:340px;">
+  <div class="t">LLM provider</div>
+  <h3>✳️ Anthropic API</h3>
+  <ul><li><span class="dot" style="background:#a78bfa"></span>Only tokens + what policy allows</li></ul>
+</div>
+<div class="box" style="left:1200px; top:555px; width:340px;">
+  <div class="t">Commercial partners (simulated)</div>
+  <h3>🍽️ TableTap · RideNow · MediMart …</h3>
+  <ul><li><span class="dot" style="background:#fbbf24"></span>Get aliases, virtual cards, neighborhoods</li></ul>
+</div>
+<div class="box" style="left:1200px; top:725px; width:340px; border-color:rgba(251,113,133,.35); background:rgba(251,113,133,.05)">
+  <h3>❓ Unknown destinations</h3>
+  <ul><li><span class="dot" style="background:#fb7185"></span>Default-deny. Zero bytes leave.</li></ul>
+</div>
+
+<div class="lbl" style="left:1060px; top:620px;">tool output (untrusted)</div>
+<div class="lbl" style="left:420px; top:300px;">tool calls w/ tokens</div>
+<div class="lbl" style="left:690px; top:735px;">resolve tokens</div>
+
+<div class="legend">
+  <span><span class="dot" style="background:#5eead4"></span> allowed / clean</span>
+  <span><span class="dot" style="background:#fbbf24"></span> minimized</span>
+  <span><span class="dot" style="background:#fb7185"></span> blocked · quarantined</span>
+  <span><span class="dot" style="background:#a78bfa"></span> vault &amp; ledger</span>
+</div>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "consentry",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The consent firewall for AI agents. Your agent can use the world's public data — the world can't use yours.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @consentry/server --filter @consentry/web dev",
+    "build": "pnpm --filter @consentry/web build",
+    "build:pages": "pnpm --filter @consentry/web build:pages",
+    "start": "pnpm build && pnpm --filter @consentry/server start",
+    "test": "vitest run",
+    "typecheck": "pnpm -r typecheck",
+    "mcp": "pnpm --filter @consentry/mcp start"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "playwright-core": "^1.64.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
