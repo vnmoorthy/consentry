@@ -14,7 +14,7 @@
   <img alt="MIT" src="https://img.shields.io/badge/license-MIT-34d399?labelColor=0b0d14" />
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-60a5fa?labelColor=0b0d14" />
   <img alt="MCP" src="https://img.shields.io/badge/MCP-server-c4b5fd?labelColor=0b0d14" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-15_passing-34d399?labelColor=0b0d14" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-16_passing-34d399?labelColor=0b0d14" />
   <img alt="Red team" src="https://img.shields.io/badge/red_team-5%2F5_contained-fb7185?labelColor=0b0d14" />
   <img alt="Runs offline" src="https://img.shields.io/badge/LLM-optional-8a93ad?labelColor=0b0d14" />
 </p>
@@ -22,7 +22,7 @@
 **Consentry** is a consent firewall that sits between an AI agent and everything it talks to: tools, APIs, MCP servers, other companies, and even the LLM itself.<br/>
 It inspects every outbound field, minimizes what isn't needed, **asks you** when it matters, quarantines prompt injections coming back, and writes a **tamper-evident receipt** of every decision.
 
-[**Live demo**](https://vnmoorthy.github.io/consentry/) · [**Watch the demo video**](assets/demo.mp4) · [**Architecture**](docs/ARCHITECTURE.md) · [**10-minute demo script**](docs/DEMO_SCRIPT.md) · [**Pitch storyboard**](docs/PITCH_STORYBOARD.md)
+[**Live demo**](https://vnmoorthy.github.io/consentry/) · [**Watch the demo video**](assets/demo.mp4) · [**Architecture**](docs/ARCHITECTURE.md) · [**10-minute demo script**](docs/DEMO_SCRIPT.md) · [**Claude mode**](docs/CLAUDE_MODE.md) · [**Pitch storyboard**](docs/PITCH_STORYBOARD.md)
 
 <img src="assets/demo.gif" alt="Consentry demo: booking dinner with a relay phone, relay email, single-use card and a minimized allergy note, then a recall sweep" width="100%" />
 
@@ -70,11 +70,18 @@ Consent banners don't fix this. Model alignment doesn't either, because a model 
 | 🚫 | **Default-deny egress** | Unverified domains never receive a request. If a policy withholds a field a tool *requires*, the call never leaves. |
 | 🧾 | **Hash-chained ledger + receipts** | Every decision is appended to a SHA-256 hash chain over canonical JSON, with masked values and a digest of the exact payload sent. Every agent run produces a privacy receipt. Edit one past entry and verification fails from that entry onward. |
 | 🔐 | **Encrypted vault** | AES-256-GCM at rest via WebCrypto, with the same code in Node (key file, `chmod 600`) and the browser (non-extractable key in IndexedDB). |
+| 👣 | **Your data footprint** | A *who-knows-what* matrix (every recipient × every data type: knows exactly · approximately · protected) computed only from the ledger. |
+| 🧹 | **Make them forget you** | One click drafts a CCPA/GDPR deletion request listing exactly what a partner received, citing ledger entries as evidence, and revokes the relay aliases and single-use cards you issued them. The agent can do it too: *"Ask TableTap to delete my data"*. |
+| 🎬 | **Guided demo tour** | 12 chapters (6–9 minutes) with talking points, one-click actions and spotlighted UI, plus a compact mode for presenting. |
 | 🔌 | **Works with any agent** | Ships as an **MCP server** and an **HTTP gateway**. It also runs fully **local-first in the browser**: the [live demo](https://vnmoorthy.github.io/consentry/) has no backend at all. |
 
 ## 🎬 See it in action
 
 <table>
+<tr>
+<td width="50%"><img src="assets/screenshots/welcome.png" alt="Welcome" /><br/><b>Your agent can use the world's data. The world can't use yours.</b></td>
+<td width="50%"><img src="assets/screenshots/tour.png" alt="Guided demo tour" /><br/><b>A guided tour built in.</b> 12 chapters with talking points and one-click actions. Present without notes.</td>
+</tr>
 <tr>
 <td width="50%"><img src="assets/screenshots/consent.png" alt="Consent prompt" /><br/><b>Consent that means something.</b> TableTap wants your allergy, so you get exact vs. minimized side by side, plus their retention policy.</td>
 <td width="50%"><img src="assets/screenshots/receipt.png" alt="Privacy receipt" /><br/><b>A receipt for every run.</b> What left, in what form, to whom, and what was withheld, anchored to the ledger head hash.</td>
@@ -82,6 +89,14 @@ Consent banners don't fix this. Model alignment doesn't either, because a model 
 <tr>
 <td><img src="assets/screenshots/redteam.png" alt="Red team" /><br/><b>Red team: 5/5 contained.</b> Poisoned reviews, zero-click image exfiltration, pasted secrets, over-collection and log tampering.</td>
 <td><img src="assets/screenshots/ledger.png" alt="Ledger tamper detection" /><br/><b>Tamper-evident ledger.</b> Rewrite one entry and the chain breaks from that point on.</td>
+</tr>
+<tr>
+<td><img src="assets/screenshots/footprint.png" alt="Footprint" /><br/><b>Who knows what about you.</b> Every recipient × every data type, from the ledger alone.</td>
+<td><img src="assets/screenshots/deletion.png" alt="Deletion request" /><br/><b>Make them forget you.</b> A CCPA/GDPR deletion request with ledger evidence, sent and confirmed.</td>
+</tr>
+<tr>
+<td><img src="assets/screenshots/claude.png" alt="What Claude saw" /><br/><b>Claude as the brain, on a diet.</b> The model received <code>[Government ID withheld]</code> and <code>{{vault:card}}</code> and still answered.</td>
+<td><img src="assets/screenshots/command.png" alt="Command center" /><br/><b>The Command Center.</b> Chat, live data-flow map and field-by-field decisions side by side.</td>
 </tr>
 <tr>
 <td><img src="assets/screenshots/policies.png" alt="Policies" /><br/><b>Policies in plain English</b>, compiled to structured rules, with a simulator that explains every decision.</td>
@@ -160,6 +175,8 @@ Or paste a key in **Settings**; it is stored encrypted with the vault. Claude st
 | `pnpm dev` | Gateway on `:8787` + Vite dev server on `:5173` with hot reload |
 | `pnpm test` | Unit tests for detection, policy, transforms, firewall, injection scanner and ledger |
 | `pnpm tsx scripts/smoke.ts` | End-to-end run of every scenario + red-team attack against the **live** public APIs |
+| `pnpm tsx scripts/claude-check.ts` | Claude mode end to end: intercepts every Anthropic request and fails if any raw vault value is sent |
+| `sh scripts/set-key.sh` | Save your Anthropic key to `.env` with hidden input, and verify it |
 | `pnpm mcp` | Start the MCP bridge (stdio) |
 | `pnpm build:pages` | Static, backend-free build (the whole firewall runs in the browser) |
 
@@ -181,7 +198,7 @@ Or paste a key in **Settings**; it is stored encrypted with the vault. Claude st
 
 **Claude Code:** `claude mcp add consentry -- npx tsx ./apps/mcp/src/index.ts`
 
-Your MCP client now gets 18 tools (weather, air quality, NWS alerts, quakes, NHTSA, openFDA, FEMA, Wikipedia, bookings, rides, refills…). Every call is firewalled, consent prompts appear in the Consentry dashboard, and everything lands in your ledger.
+Your MCP client now gets 19 tools (weather, air quality, NWS alerts, quakes, NHTSA, openFDA, FEMA, Wikipedia, bookings, rides, refills…). Every call is firewalled, consent prompts appear in the Consentry dashboard, and everything lands in your ledger.
 
 **Any agent framework, over plain HTTP:**
 
@@ -284,7 +301,8 @@ consentry/
 │   ├── src/llm.ts          #   Claude tool-use loop (only sees tokens)
 │   ├── src/runtime.ts      #   the single choke point + events, receipts, stats
 │   ├── src/redteam.ts      #   5 attack scenarios
-│   └── src/tools/          #   12 live public-data tools + 5 simulated partners
+│   ├── src/footprint.ts    #   who-knows-what matrix + CCPA/GDPR deletion letters
+│   └── src/tools/          #   12 live public-data tools + 5 simulated partners + 1 on-device tool
 ├── apps/server/            # Hono gateway: REST + SSE + SQLite ledger + AES-GCM vault
 ├── apps/web/               # React 19 + Vite + Tailwind v4 + Framer Motion dashboard
 ├── apps/mcp/               # MCP bridge (stdio) → gateway
@@ -298,7 +316,8 @@ consentry/
 - [ ] LLM-assisted semantic classifier for paraphrased sensitive data
 - [ ] Signed policy bundles + external ledger anchoring (Sigstore / transparency log)
 - [ ] Browser extension: the same firewall in front of ChatGPT, Claude.ai and other web agents
-- [ ] Data-subject requests: one click to ask every partner in your ledger to delete what they got
+- [x] Data-subject requests: one click to ask a partner to delete what it got, with ledger evidence
+- [ ] Real delivery of deletion requests (email/API) and tracking of statutory deadlines
 - [ ] Policy packs for GDPR, CCPA/CPRA and HIPAA "minimum necessary"
 - [ ] Multi-agent: per-agent identities and budgets ("this agent may share 3 contact fields per day")
 

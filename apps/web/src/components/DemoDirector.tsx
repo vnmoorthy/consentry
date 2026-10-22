@@ -161,9 +161,9 @@ export function DemoDirector() {
             ) : (
             <div className="p-5">
               <div className="flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-mint">
-                <Clapperboard size={13} /> Demo tour · {idx + 1} of {chapters.length}
-                <span className="ml-auto font-mono normal-case tracking-normal text-ink-500">
-                  ~{Math.ceil(remaining / 60)} of {Math.ceil(total / 60)} min left
+                <Clapperboard size={13} className="shrink-0" /> <span className="whitespace-nowrap">Tour {idx + 1}/{chapters.length}</span>
+                <span className="ml-auto whitespace-nowrap font-mono normal-case tracking-normal text-ink-500" title={`About ${Math.ceil(total / 60)} minutes in total`}>
+                  ~{Math.ceil(remaining / 60)} min left
                 </span>
                 <button onClick={toggleCompact} className="rounded p-1 text-ink-400 hover:bg-white/10 hover:text-white" aria-label="Compact tour" title="Compact: keep the tour small while you present">
                   <Minimize2 size={13} />

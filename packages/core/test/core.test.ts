@@ -154,3 +154,25 @@ describe('ledger', () => {
     expect(v.brokenAt).toBeGreaterThan(0);
   });
 });
+
+describe('footprint & deletion requests', () => {
+  it('computes who-knows-what from the ledger and drafts a deletion letter citing it', async () => {
+    const { ConsentryRuntime, MemoryStore } = await import('../src');
+    const rt = await ConsentryRuntime.create({ store: new MemoryStore(), mode: 'local', fetch: (async () => new Response('{}')) as any });
+    rt.on((e) => {
+      if (e.type === 'consent.request') setTimeout(() => rt.resolveConsent(e.request.id, 'minimize'), 5);
+    });
+    await rt.callTool('book_table', { restaurant_id: 'rst_verdant', name: '{{vault:full_name}}', phone: '{{vault:phone}}', email: '{{vault:email}}', card: '{{vault:card}}', notes: '{{vault:allergy_peanut}}' }, { origin: 'agent' });
+    const fp = rt.footprint();
+    const row = fp.rows.find((r) => r.recipientId === 'tabletap')!;
+    expect(row.cells.Identity?.state).toBe('exact');
+    expect(row.cells.Contact?.state).toBe('approx');
+    expect(row.cells.Money?.state).toBe('approx');
+    const req = await rt.draftDeletion('tabletap');
+    expect(req.letter).toMatch(/TableTap/);
+    expect(req.letter).toMatch(/relay/);
+    expect(req.letter).not.toMatch(/4242 4242/);
+    expect(req.evidence.length).toBe(1);
+    await expect(rt.draftDeletion('openfda')).rejects.toThrow(/nothing to delete/);
+  });
+});

@@ -11,16 +11,16 @@ const OUT = '../Consentry-pitch.pptx';
 const M = 'media/';
 
 const THEME = {
-  name: 'Consentry Night',
+  name: 'Consentry Ember Horizon',
   headFontFace: 'Calibri',
   bodyFontFace: 'Calibri',
   colors: {
-    dk1: '05060A', lt1: 'FFFFFF', dk2: '131722', lt2: 'B9C0D4',
-    accent1: '5EEAD4', accent2: 'A78BFA', accent3: 'FBBF24', accent4: 'FB7185', accent5: '60A5FA', accent6: '34D399',
-    hlink: '5EEAD4', folHlink: 'A78BFA',
+    dk1: '0E0F0C', lt1: 'FFFFFF', dk2: '1A1B17', lt2: 'CDC7BB',
+    accent1: 'EFA56F', accent2: 'F6D8B4', accent3: 'FBBF24', accent4: 'FB7185', accent5: '60A5FA', accent6: '34D399',
+    hlink: 'EFA56F', folHlink: 'F6D8B4',
   },
 };
-const HEX = { ink: '05060A', panel: '131722', panel2: '1B2030', line: '2A3045', muted: '8A93AD', soft: 'B9C0D4', white: 'FFFFFF', mint: '5EEAD4', violet: 'A78BFA', amber: 'FBBF24', rose: 'FB7185', sky: '60A5FA', green: '34D399' };
+const HEX = { ink: '0E0F0C', panel: '1A1B17', panel2: '22231E', line: '33342E', muted: 'A7A196', soft: 'CDC7BB', white: 'FFFFFF', mint: 'EFA56F', violet: 'F6D8B4', amber: 'FBBF24', rose: 'FB7185', sky: '60A5FA', green: '34D399' };
 
 const pres = new pptxgen();
 pres.layout = 'LAYOUT_WIDE'; // 13.333 x 7.5
@@ -44,9 +44,9 @@ pres.defineSlideMaster({
   objects: [
     { placeholder: { options: { name: 'kicker', type: 'body', x: 0.6, y: 0.42, w: 10.8, h: 0.34, fontSize: 12, bold: true, color: C.accent1, charSpacing: 3, margin: 0, valign: 'middle' }, text: '' } },
     { placeholder: { options: { name: 'title', type: 'title', x: 0.6, y: 0.78, w: 11.2, h: 0.85, fontSize: 34, bold: true, color: C.background1, margin: 0, valign: 'middle', align: 'left' }, text: '' } },
-    { text: { text: 'CONSENTRY  ·  the consent firewall for AI agents', options: { x: 0.6, y: 7.02, w: 6, h: 0.3, fontSize: 10, color: '5B6480', margin: 0, isTextBox: true } } },
+    { text: { text: 'C O N S E N T R Y   ·   the consent firewall for AI agents', options: { x: 0.6, y: 7.02, w: 6, h: 0.3, fontSize: 10, color: '77736A', margin: 0, isTextBox: true } } },
   ],
-  slideNumber: { x: 12.35, y: 7.02, w: 0.4, h: 0.3, fontSize: 10, color: '5B6480', align: 'right' },
+  slideNumber: { x: 12.35, y: 7.02, w: 0.4, h: 0.3, fontSize: 10, color: '77736A', align: 'right' },
 });
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -68,7 +68,7 @@ const pill = (s, name, t, x, y, w, color) => {
   s.addText(t, { x, y, w, h: 0.42, align: 'center', valign: 'middle', fontSize: 13, bold: true, color, margin: 0, isTextBox: true, objectName: name + '-t' });
 };
 const frame = (s, name, path, x, y, w, h) => {
-  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: x - 0.06, y: y - 0.06, w: w + 0.12, h: h + 0.12, rectRadius: 0.12, fill: { color: HEX.panel }, line: { color: '3A4258', width: 1 }, shadow: { type: 'outer', color: '5EEAD4', opacity: 0.25, blur: 24, offset: 0, angle: 90 }, objectName: name + '-frame' });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: x - 0.06, y: y - 0.06, w: w + 0.12, h: h + 0.12, rectRadius: 0.12, fill: { color: HEX.panel }, line: { color: '3A3A33', width: 1 }, shadow: { type: 'outer', color: 'EFA56F', opacity: 0.22, blur: 24, offset: 0, angle: 90 }, objectName: name + '-frame' });
   s.addImage({ path, x, y, w, h, objectName: name });
 };
 
@@ -78,6 +78,7 @@ pres.addSection({ title: 'Opening' });
   const s = pres.addSlide({ masterName: 'COVER', sectionTitle: 'Opening' });
   orb(s, 7.6, -1.6, 7.5);
   logo(s, 0.7, 0.9, 1.05);
+  text(s, 'anim-1-fade-wordmark', 'C O N S E N T R Y', { x: 1.95, y: 1.18, w: 4.5, h: 0.5, fontSize: 22, color: HEX.white, charSpacing: 4 });
   text(s, 'anim-1-fade-kicker', 'NATIONAL RENAISSANCE HACKATHON  ·  SUPER{SET}', { x: 0.7, y: 2.2, w: 6.2, h: 0.35, fontSize: 13, bold: true, color: HEX.mint, charSpacing: 3 });
   text(s, 'anim-2-rise-title', [
     { text: 'The consent firewall', options: { breakLine: true } },
@@ -88,7 +89,7 @@ pres.addSection({ title: 'Opening' });
   pill(s, 'anim-4-rise-p2', 'Track 2 · Personal Agents & Privacy', 3.8, 5.75, 3.6, HEX.violet);
   frame(s, 'anim-5-zoom-shot', M + 'command-live.jpg', 7.35, 1.35, 5.45, 3.41);
   text(s, 'anim-6-fade-link', 'github.com/vnmoorthy/consentry   ·   vnmoorthy.github.io/consentry', { x: 7.35, y: 4.98, w: 5.45, h: 0.35, fontSize: 12, color: HEX.muted, align: 'right' });
-  [['12', 'live public-data APIs', HEX.mint], ['18', 'firewalled MCP tools', HEX.violet], ['5/5', 'red-team attacks contained', HEX.green]].forEach(([n, l, col], i) => {
+  [['12', 'live public-data APIs', HEX.mint], ['19', 'firewalled MCP tools', HEX.violet], ['5/5', 'red-team attacks contained', HEX.green]].forEach(([n, l, col], i) => {
     const x = 0.7 + i * 2.35;
     text(s, `anim-7-rise-sn${i}`, n, { x, y: 6.35, w: 2.2, h: 0.55, fontSize: 30, bold: true, color: col, valign: 'middle' });
     text(s, `anim-7-rise-sl${i}`, l, { x, y: 6.88, w: 2.2, h: 0.3, fontSize: 12, color: HEX.muted });
@@ -125,7 +126,7 @@ pres.addSection({ title: 'Problem' });
     s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 7.2, y, w: 1.55, h: 0.48, rectRadius: 0.24, fill: { color: HEX.rose, transparency: 85 }, line: { color: HEX.rose, width: 1 }, objectName: `anim-5-fade-d${i}` });
     s.addText(d, { x: 7.2, y, w: 1.55, h: 0.48, align: 'center', valign: 'middle', fontSize: 13, bold: true, color: 'FDA4AF', margin: 0, isTextBox: true, objectName: `anim-5-fade-dt${i}` });
     const y2 = 2.35 + i * 1.0;
-    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 10.95, y: y2, w: 1.6, h: 0.48, rectRadius: 0.1, fill: { color: HEX.panel2 }, line: { color: i === 3 ? HEX.rose : '3A4258', width: 1 }, objectName: `anim-7-fade-r${i}` });
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 10.95, y: y2, w: 1.6, h: 0.48, rectRadius: 0.1, fill: { color: HEX.panel2 }, line: { color: i === 3 ? HEX.rose : '3A3A33', width: 1 }, objectName: `anim-7-fade-r${i}` });
     s.addText(d === 'Anxiety meds' ? dest[i] : dest[i], { x: 10.95, y: y2, w: 1.6, h: 0.48, align: 'center', valign: 'middle', fontSize: 12, color: i === 3 ? 'FDA4AF' : HEX.soft, margin: 0, isTextBox: true, objectName: `anim-7-fade-rt${i}` });
   });
   s.addShape(pres.shapes.OVAL, { x: 9.25, y: 3.4, w: 1.2, h: 1.2, fill: { color: HEX.violet, transparency: 80 }, line: { color: HEX.violet, width: 1.5 }, objectName: 'anim-6-zoom-agent' });
@@ -155,7 +156,7 @@ pres.addSection({ title: 'Solution' });
   card(s, 'anim-2-rise-cl', 0.6, 3.0, 5.6, 3.55, HEX.panel);
   text(s, 'anim-2-rise-tl', 'TODAY', { x: 0.95, y: 3.25, w: 3, h: 0.35, fontSize: 13, bold: true, color: HEX.rose, charSpacing: 3 });
   left.forEach((t, i) => text(s, `anim-2-rise-l${i}`, '✕   ' + t, { x: 0.95, y: 3.8 + i * 0.62, w: 5.1, h: 0.45, fontSize: 16, color: HEX.soft }));
-  card(s, 'anim-3-rise-cr', 6.55, 3.0, 6.2, 3.55, '0F1F1E', '2DD4BF');
+  card(s, 'anim-3-rise-cr', 6.55, 3.0, 6.2, 3.55, '241A12', 'EFA56F');
   text(s, 'anim-3-rise-tr', 'WITH CONSENTRY', { x: 6.9, y: 3.25, w: 4, h: 0.35, fontSize: 13, bold: true, color: HEX.mint, charSpacing: 3 });
   right.forEach((t, i) => text(s, `anim-3-rise-r${i}`, '✓   ' + t, { x: 6.9, y: 3.8 + i * 0.62, w: 5.7, h: 0.45, fontSize: 16, bold: true }));
   s.addNotes(
@@ -195,7 +196,7 @@ pres.addSection({ title: 'Solution' });
   orb(s, 9.6, 3.6, 6.0);
   logo(s);
   header(s, 'DATA MINIMIZATION', 'Share the least that still gets the job done');
-  const hdr = (t) => ({ text: t, options: { bold: true, color: HEX.mint, fontSize: 12, fill: { color: '0F1F1E' } } });
+  const hdr = (t) => ({ text: t, options: { bold: true, color: HEX.mint, fontSize: 12, fill: { color: '241A12' } } });
   const row = (a, b, c, d, col = HEX.amber) => [
     { text: a, options: { bold: true, color: HEX.white } },
     { text: b, options: { color: HEX.muted, fontFace: 'Courier New', fontSize: 12 } },
@@ -214,7 +215,7 @@ pres.addSection({ title: 'Solution' });
       row('Medication', 'Albuterol (ProAir)', 'albuterol', 'openFDA'),
       row('SSN', '078-05-1120', 'never leaves', 'anyone', HEX.rose),
     ],
-    { x: 0.6, y: 1.9, w: 8.55, colW: [1.45, 2.4, 2.75, 1.95], fontSize: 13, color: HEX.soft, fill: { color: HEX.panel }, border: { type: 'solid', pt: 0.75, color: '262C3F' }, rowH: 0.5, valign: 'middle', margin: [0, 0.1, 0, 0.12], objectName: 'anim-1-fade-table' },
+    { x: 0.6, y: 1.9, w: 8.55, colW: [1.45, 2.4, 2.75, 1.95], fontSize: 13, color: HEX.soft, fill: { color: HEX.panel }, border: { type: 'solid', pt: 0.75, color: '33342E' }, rowH: 0.5, valign: 'middle', margin: [0, 0.1, 0, 0.12], objectName: 'anim-1-fade-table' },
   );
   card(s, 'anim-2-zoom-call', 9.55, 1.9, 3.2, 4.5, HEX.panel, HEX.amber);
   text(s, 'anim-2-zoom-ct', 'QuickQuote asked for 8 fields to give a car-insurance quote.', { x: 9.85, y: 2.15, w: 2.65, h: 1.1, fontSize: 15, bold: true, valign: 'top' });
@@ -276,7 +277,7 @@ pres.addSection({ title: 'Demo' });
     });
     y += 0.16;
   });
-  card(s, 'anim-4-rise-nk', 8.7, 5.68, 4.05, 0.98, '0F1F1E', '2DD4BF');
+  card(s, 'anim-4-rise-nk', 8.7, 5.68, 4.05, 0.98, '241A12', 'EFA56F');
   text(s, 'anim-4-rise-nkt', 'No keys, no accounts. 12 live APIs, and they only ever see a coarsened location.', { x: 8.9, y: 5.72, w: 3.7, h: 0.9, fontSize: 13.5, color: HEX.soft, valign: 'middle' });
   s.addNotes(
     'This is the real product. The weather, air quality, alerts, earthquakes, vehicle and drug recalls are live from twelve public APIs: NWS, USGS, NHTSA, openFDA, OpenFEMA, Open-Meteo and Wikipedia. Watch the booking: TableTap gets my real name, a relay phone, a relay email and a single-use card. My allergy goes out as a dietary need only after I approve it.',
@@ -357,7 +358,7 @@ pres.addSection({ title: 'Close' });
   });
   text(s, 'anim-4-fade-why', 'Privacy law already demands purpose limitation and data minimization. Autonomous agents make both impossible without a boundary. Consentry is that boundary, and every decision comes with proof.', { x: 0.6, y: 4.7, w: 8.3, h: 1.1, fontSize: 16, color: HEX.soft, valign: 'top' });
   text(s, 'anim-5-rise-close', 'Your data. Your rules. Your receipt.', { x: 0.6, y: 5.95, w: 8.3, h: 0.6, fontSize: 26, bold: true, color: HEX.white });
-  const qr = await QRCode.toDataURL('https://vnmoorthy.github.io/consentry/', { margin: 1, width: 600, color: { dark: '05060AFF', light: 'FFFFFFFF' } });
+  const qr = await QRCode.toDataURL('https://vnmoorthy.github.io/consentry/', { margin: 1, width: 600, color: { dark: '0E0F0CFF', light: 'FFFFFFFF' } });
   card(s, 'anim-6-zoom-qrbg', 9.55, 4.55, 3.2, 2.3, 'FFFFFF', 'FFFFFF');
   s.addImage({ data: qr.replace('data:', ''), x: 9.7, y: 4.7, w: 2.0, h: 2.0, objectName: 'anim-6-zoom-qr' });
   text(s, 'anim-6-zoom-qrt', 'Try the live demo', { x: 11.75, y: 4.8, w: 0.95, h: 1.8, fontSize: 12, bold: true, color: HEX.ink, valign: 'middle' });

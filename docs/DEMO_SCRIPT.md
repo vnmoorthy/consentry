@@ -10,6 +10,7 @@ curl -s -XPOST localhost:8787/api/reset           # clean ledger, default polici
 ```
 
 - Browser full-screen at ~1440×900, dark room friendly. Open the Command Center.
+- **Easiest path:** click **Demo tour** (bottom right). It walks all 12 chapters below, with talking points, one-click actions and spotlights. Use the compact toggle so it stays out of the way.
 - Backup plan if Wi-Fi is flaky: the partner scenarios (dinner, ride, refill, insurance, red team) are simulated and work offline. Only the public-API scenarios need the network.
 - Optional: put `ANTHROPIC_API_KEY` in `.env` to make Claude the brain. Swap in the 3-minute segment from [CLAUDE_MODE.md](CLAUDE_MODE.md) after the Red Team section.
 
@@ -63,6 +64,10 @@ Go to **Red Team** and click **Run all 5 attacks**. While it runs:
 5. **Log tampering.** Caught at the exact entry.
 
 Land it: **5/5 contained.**
+
+## +1 min (optional) · Who knows what about me
+
+Go to **Footprint**: the matrix shows every recipient × data type (exact · approximate · protected). Click **TableTap → Request deletion → Send**. The letter lists exactly what TableTap got, cites the ledger entries, and is confirmed seconds later (simulated). Or ask the agent: *"Ask TableTap to delete my data"*.
 
 ## 7:15 – 8:30 · Proof, not promises
 
