@@ -312,6 +312,8 @@ export interface Settings {
   hasApiKey: boolean;
   keySource?: 'env' | 'user';
   compromisedAgent: boolean;
+  /** Red-team switch for live demos: partner APIs return poisoned content (prompt injection, exfil images). */
+  poisonPartners: boolean;
   consentTimeoutSec: number;
 }
 
@@ -359,7 +361,7 @@ export interface PersistedState {
   policies: PolicyRule[];
   recipients: Recipient[];
   disabledTools: string[];
-  settings: Omit<Settings, 'hasApiKey' | 'keySource'> & { apiKey?: string };
+  settings: Omit<Settings, 'hasApiKey' | 'keySource'> & { apiKey?: string; agentModeSetByUser?: boolean };
   stats: Stats;
   chat: ChatTurn[];
   receipts: Receipt[];

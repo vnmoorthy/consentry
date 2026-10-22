@@ -152,7 +152,7 @@ cp .env.example .env   # set ANTHROPIC_API_KEY=… (defaults to claude-opus-5-5)
 pnpm start
 ```
 
-Or paste a key in **Settings**; it is stored encrypted with the vault. Claude still only ever sees tokens.
+Or paste a key in **Settings**; it is stored encrypted with the vault. Claude still only ever sees tokens. See [**docs/CLAUDE_MODE.md**](docs/CLAUDE_MODE.md) for the Claude demo segment and `pnpm tsx scripts/claude-check.ts`, which proves no raw vault value reaches the model. If Claude is unreachable, runs fall back to Autopilot automatically.
 
 | Command | What it does |
 |---|---|

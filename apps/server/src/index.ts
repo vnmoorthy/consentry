@@ -32,6 +32,7 @@ const rt = await ConsentryRuntime.create({
   envApiKey: process.env.ANTHROPIC_API_KEY || undefined,
   envModel: process.env.CONSENTRY_MODEL || undefined,
   envEffort: (process.env.CONSENTRY_EFFORT as any) || undefined,
+  envAgent: (process.env.CONSENTRY_AGENT as any) || undefined,
 });
 
 const app = new Hono();

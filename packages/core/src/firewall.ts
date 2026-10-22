@@ -254,9 +254,12 @@ function toDecision(p: Planned, recipient: Recipient, display: string): FieldDec
 }
 
 /** Sanitize text before it reaches the LLM provider (the model is a recipient too). Never prompts. */
-export function inspectLLMText(text: string, llm: Recipient, deps: Pick<FirewallDeps, 'vault' | 'rules'>): { sanitized: string; decisions: FieldDecision[] } {
+export function inspectLLMText(text: string, llm: Recipient, deps: Pick<FirewallDeps, 'vault' | 'rules'>, opts: { toolResult?: boolean } = {}): { sanitized: string; decisions: FieldDecision[] } {
   const vault = deps.vault();
-  const findings = detect(text, vault).filter((f) => f.detector !== 'token' && f.detector !== 'lexicon');
+  // Tool results are full of public phone numbers and addresses (hotlines, firms); only *your* data and
+  // always-sensitive patterns are tokenized there. User prompts get the full treatment.
+  const ALWAYS = ['identity.gov_id', 'financial.card', 'secret.credential'];
+  const findings = detect(text, vault).filter((f) => f.detector !== 'token' && f.detector !== 'lexicon' && (!opts.toolResult || !!f.itemId || ALWAYS.includes(f.category)));
   const byId = new Map(vault.map((v) => [v.id, v]));
   const decisions: FieldDecision[] = [];
   let s = text;

@@ -109,6 +109,11 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             {s?.agentMode === 'claude' ? <Bot size={13} className="text-violet" /> : <Cpu size={13} className="text-violet" />}
             <span className="truncate text-ink-300">{s?.agentMode === 'claude' ? `Claude · ${s.model}` : 'Autopilot · on-device'}</span>
           </div>
+          {s?.poisonPartners && (
+            <div className="flex items-center gap-2 text-amber-300">
+              <Skull size={13} /> Hostile partners ON
+            </div>
+          )}
           {s?.compromisedAgent && (
             <div className="flex items-center gap-2 text-rose-300">
               <Skull size={13} /> Compromised-agent sim ON

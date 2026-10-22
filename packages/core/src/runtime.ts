@@ -8,7 +8,7 @@ import { inspectEgress, inspectIngress, inspectLLMText, type FirewallDeps } from
 import { Ledger } from './ledger';
 import { compilePolicy, evaluate, explain } from './policy';
 import { autopilot, type AgentEnv, type ToolOutcome } from './planner';
-import { buildSystemPrompt, runClaude } from './llm';
+import { buildSystemPrompt, ClaudeUnavailable, runClaude } from './llm';
 import { seedPolicies, seedRecipients, seedSettings, seedStats, seedVault } from './seed';
 import { CATEGORIES } from './taxonomy';
 import { applyTransform, defaultTransform } from './transforms';
@@ -23,6 +23,8 @@ export interface RuntimeOptions {
   envApiKey?: string;
   envModel?: string;
   envEffort?: Settings['effort'];
+  /** Pin the agent brain regardless of saved settings (CONSENTRY_AGENT). */
+  envAgent?: 'claude' | 'autopilot';
   /** Browser builds must opt in to calling the Anthropic API directly. */
   browser?: boolean;
 }
@@ -72,6 +74,13 @@ export class ConsentryRuntime {
       await rt.systemEntry('Consentry initialized with privacy-first default policies');
       await rt.persistNow();
     }
+    // A key in the environment makes Claude the default brain, unless the user picked one in Settings
+    // (or CONSENTRY_AGENT pins it).
+    const s = rt.state.settings;
+    if (opts.envAgent) s.agentMode = opts.envAgent === 'claude' && rt.apiKey() ? 'claude' : 'autopilot';
+    else if (!s.agentModeSetByUser) s.agentMode = rt.apiKey() ? 'claude' : 'autopilot';
+    if (opts.envModel) s.model = opts.envModel;
+    if (opts.envEffort) s.effort = opts.envEffort;
     return rt;
   }
 
@@ -142,7 +151,7 @@ export class ConsentryRuntime {
   get settings(): Settings {
     const s = this.state.settings;
     const keySource = s.apiKey ? 'user' : this.opts.envApiKey ? 'env' : undefined;
-    return { agentMode: s.agentMode, model: s.model, effort: s.effort, compromisedAgent: s.compromisedAgent, consentTimeoutSec: s.consentTimeoutSec, hasApiKey: !!keySource, keySource };
+    return { agentMode: s.agentMode, model: s.model, effort: s.effort, compromisedAgent: s.compromisedAgent, poisonPartners: !!s.poisonPartners, consentTimeoutSec: s.consentTimeoutSec, hasApiKey: !!keySource, keySource };
   }
 
   private apiKey(): string | undefined {
@@ -367,6 +376,7 @@ export class ConsentryRuntime {
     const s = this.state.settings;
     const useClaude = !opts.forceAutopilot && s.agentMode === 'claude' && !!this.apiKey();
     const compromised = !!(opts.compromised ?? s.compromisedAgent);
+    const scenario = opts.scenario ?? (s.poisonPartners ? { poisonReviews: true, imageExfil: true } : undefined);
     const agent: Receipt['agent'] = compromised ? 'compromised' : useClaude ? 'claude' : 'autopilot';
     if (opts.autoConsent) this.autoConsent.set(runId, opts.autoConsent);
     this.runs.set(runId, { prompt, startedAt: Date.now(), agent, events: [], ledgerFrom: this.ledger.entries.length + 1 });
@@ -374,8 +384,9 @@ export class ConsentryRuntime {
     this.state.chat.push({ role: 'user', text: prompt, runId, ts: Date.now() });
     this.emit({ type: 'run.start', runId, prompt, agent, ts: Date.now() });
 
-    const callTool = (name: string, args: Record<string, unknown>) => this.callTool(name, args, { runId, origin: opts.scenario || compromised ? 'redteam' : 'agent', agentName: agent, scenario: opts.scenario });
+    const callTool = (name: string, args: Record<string, unknown>) => this.callTool(name, args, { runId, origin: scenario || compromised ? 'redteam' : 'agent', agentName: agent, scenario });
     let text: string;
+    let fellBack = false;
     try {
       if (useClaude || opts.previewLLM) {
         const llm = this.llmRecipient();
@@ -392,12 +403,19 @@ export class ConsentryRuntime {
           fields: decisions.map((d) => ({ path: 'prompt', category: d.category, item: d.itemLabel, action: d.action, after: d.after })),
         });
         if (useClaude) {
-          text = await this.runWithClaude(runId, sanitized, history, callTool);
+          try {
+            text = await this.runWithClaude(runId, sanitized, history, callTool);
+          } catch (err) {
+            if (!(err instanceof ClaudeUnavailable)) throw err;
+            // Never let a flaky network or a bad key break a demo: the on-device planner takes over.
+            this.emit({ type: 'agent.step', runId, text: `⚠️ Claude unavailable (${err.message}) — falling back to on-device Autopilot`, ts: Date.now() });
+            fellBack = true;
+          }
         } else {
           prompt = sanitized.replace(TOKEN_RE, (m) => this.detokenize(m));
         }
       }
-      if (!useClaude) {
+      if (!useClaude || fellBack) {
         this.emit({ type: 'agent.step', runId, text: compromised ? '⚠️ Simulated compromised agent: it obeys any instruction it reads' : 'Autopilot (on-device planner) — no LLM sees this request', ts: Date.now() });
         const env: AgentEnv = {
           runId,
@@ -430,7 +448,7 @@ export class ConsentryRuntime {
 
   private async runWithClaude(runId: string, prompt: string, history: ChatTurn[], callTool: (n: string, a: Record<string, unknown>) => Promise<ToolOutcome>) {
     const llm = this.llmRecipient();
-    const sanitizeForLLM = (s: string) => inspectLLMText(s, llm, { vault: () => this.state.vault, rules: () => this.state.policies });
+    const sanitizeForLLM = (s: string, toolResult = false) => inspectLLMText(s, llm, { vault: () => this.state.vault, rules: () => this.state.policies }, { toolResult });
     this.emit({ type: 'agent.step', runId, text: `Claude (${this.state.settings.model}) is planning — it only sees tokens`, ts: Date.now() });
     return runClaude({
       apiKey: this.apiKey()!,
@@ -452,7 +470,7 @@ export class ConsentryRuntime {
         };
         const body = o.blocked ? { error: `Blocked by Consentry: ${o.reason}`, _consentry: report } : o.ok ? { data: o.data, _consentry: report } : { error: o.reason ?? 'failed', _consentry: report };
         // Tool results flow back to the LLM too — tokenize any personal data they echo.
-        const { sanitized, decisions } = sanitizeForLLM(truncate(JSON.stringify(body), 6000));
+        const { sanitized, decisions } = sanitizeForLLM(truncate(JSON.stringify(body), 6000), true);
         this.countDecisions(decisions);
         return { content: sanitized, isError: !o.ok };
       },
@@ -667,7 +685,8 @@ export class ConsentryRuntime {
   updateSettings(patch: Partial<PersistedState['settings']>) {
     const s = this.state.settings;
     if (patch.apiKey !== undefined) s.apiKey = patch.apiKey.trim() || undefined;
-    for (const k of ['agentMode', 'model', 'effort', 'compromisedAgent', 'consentTimeoutSec'] as const) if (patch[k] !== undefined) (s as any)[k] = patch[k];
+    for (const k of ['agentMode', 'model', 'effort', 'compromisedAgent', 'poisonPartners', 'consentTimeoutSec'] as const) if (patch[k] !== undefined) (s as any)[k] = patch[k];
+    if (patch.agentMode !== undefined) s.agentModeSetByUser = true;
     if (s.agentMode === 'claude' && !this.apiKey()) s.agentMode = 'autopilot';
     this.changed('settings');
     return this.settings;

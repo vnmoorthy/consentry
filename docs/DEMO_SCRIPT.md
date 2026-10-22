@@ -11,7 +11,7 @@ curl -s -XPOST localhost:8787/api/reset           # clean ledger, default polici
 
 - Browser full-screen at ~1440×900, dark room friendly. Open the Command Center.
 - Backup plan if Wi-Fi is flaky: the partner scenarios (dinner, ride, refill, insurance, red team) are simulated and work offline. Only the public-API scenarios need the network.
-- Optional: put `ANTHROPIC_API_KEY` in `.env` to show Claude mode at the end.
+- Optional: put `ANTHROPIC_API_KEY` in `.env` to make Claude the brain. Swap in the 3-minute segment from [CLAUDE_MODE.md](CLAUDE_MODE.md) after the Red Team section.
 
 ---
 

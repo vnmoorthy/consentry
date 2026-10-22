@@ -105,6 +105,15 @@ export default function Settings() {
                 <div className="text-[12px] text-ink-400">The agent will obey any instruction it finds in tool output. This proves the firewall holds even when the model doesn&apos;t. Pair it with the poisoned-review attack.</div>
               </div>
             </div>
+            <div className="flex items-start gap-4">
+              <Toggle checked={s.poisonPartners} onChange={(v) => update({ poisonPartners: v }, v ? 'Hostile partners ON: reviews carry prompt injections' : 'Partners are well-behaved again')} label="Hostile partners" />
+              <div>
+                <div className="flex items-center gap-2 text-[13.5px] font-semibold text-white">
+                  <Skull size={14} className="text-amber-300" /> Hostile partners (live red team)
+                </div>
+                <div className="text-[12px] text-ink-400">BiteFinder reviews hide a prompt injection and TableTap confirmations smuggle an exfiltration image. Try “book dinner” with Claude as the brain and watch the quarantine fire.</div>
+              </div>
+            </div>
             <div className="flex items-center gap-4">
               <input type="number" min={30} max={900} className="input !w-24" value={timeout} onChange={(e) => setTimeoutSec(Number(e.target.value))} onBlur={() => update({ consentTimeoutSec: Math.max(30, Math.min(900, timeout)) })} />
               <div>

@@ -112,5 +112,5 @@ export function seedStats(): Stats {
 }
 
 export function seedSettings(): Omit<Settings, 'hasApiKey' | 'keySource'> {
-  return { agentMode: 'autopilot', model: 'claude-opus-5-5', effort: 'low', compromisedAgent: false, consentTimeoutSec: 180 };
+  return { agentMode: 'autopilot', model: 'claude-opus-5-5', effort: 'low', compromisedAgent: false, poisonPartners: false, consentTimeoutSec: 180 };
 }
