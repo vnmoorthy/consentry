@@ -79,10 +79,13 @@ interface AppState {
   toast(t: Omit<Toast, 'id'>): void;
   dismissToast(id: string): void;
   openReceipt(runId: string | null): void;
+  replay(runId: string): void;
   clearChat(): Promise<void>;
 }
 
 let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+/** True while re-applying past events after a reload: rebuild feed and traces, but no chat duplicates, packets or toasts. */
+let replaying = false;
 let seq = 0;
 const nid = (p: string) => `${p}${Date.now().toString(36)}${(seq++).toString(36)}`;
 
@@ -97,6 +100,7 @@ export const useApp = create<AppState>((set, get) => {
 
   const pushFeed = (item: FeedItem) => set({ feed: [item, ...get().feed].slice(0, 120) });
   const pushPackets = (ps: Omit<Packet, 'id' | 'ts'>[]) => {
+    if (replaying) return;
     const now = Date.now();
     const fresh = get().packets.filter((p) => now - p.ts < 6000);
     set({ packets: [...fresh, ...ps.map((p) => ({ ...p, id: nid('pk'), ts: now }))].slice(-60) });
@@ -108,7 +112,7 @@ export const useApp = create<AppState>((set, get) => {
         set({
           runs: { ...get().runs, [e.runId]: { runId: e.runId, prompt: e.prompt, agent: e.agent, steps: [], calls: [], status: 'running', startedAt: e.ts } },
           activeRunId: e.runId,
-          chat: get().chat.some((c) => c.runId === e.runId && c.role === 'user') ? get().chat : [...get().chat, { id: nid('m'), role: 'user', text: e.prompt, runId: e.runId, ts: e.ts }],
+          chat: replaying || get().chat.some((c) => c.runId === e.runId && c.role === 'user') ? get().chat : [...get().chat, { id: nid('m'), role: 'user', text: e.prompt, runId: e.runId, ts: e.ts }],
         });
         break;
       case 'agent.step':
@@ -125,6 +129,7 @@ export const useApp = create<AppState>((set, get) => {
       case 'firewall.egress': {
         patchCall(e.runId, e.callId, (c) => ({ ...c, egress: e.result }));
         pushFeed({ id: nid('f'), kind: 'egress', ts: e.ts, runId: e.runId, tool: e.tool, recipientId: e.recipientId, purpose: e.purpose, result: e.result });
+        if (e.recipientId === 'self') break;
         const blocked = e.result.verdict === 'blocked';
         const ps: Omit<Packet, 'id' | 'ts'>[] = e.result.decisions.map((d, i) => ({ category: d.category, recipientId: e.recipientId, outcome: blocked ? 'blocked' : d.action, label: d.itemLabel ?? '', delay: i * 0.14 }));
         if (!ps.length) ps.push({ category: 'query', recipientId: e.recipientId, outcome: blocked ? 'blocked' : 'query', label: e.tool, delay: 0 });
@@ -135,14 +140,14 @@ export const useApp = create<AppState>((set, get) => {
         patchCall(e.runId, e.callId, (c) => ({ ...c, ingress: e.result }));
         pushFeed({ id: nid('f'), kind: 'ingress', ts: e.ts, runId: e.runId, tool: e.tool, recipientId: e.recipientId, result: e.result });
         pushPackets([{ category: 'query', recipientId: e.recipientId, outcome: 'threat', label: 'injection', delay: 0.2 }]);
-        get().toast({ tone: 'bad', title: 'Prompt injection quarantined', body: `${e.result.threats[0]?.signals[0] ?? 'Suspicious content'} — from ${e.recipientId}` });
+        if (!replaying) get().toast({ tone: 'bad', title: 'Prompt injection quarantined', body: `${e.result.threats[0]?.signals[0] ?? 'Suspicious content'} — from ${e.recipientId}` });
         break;
       case 'tool.result':
         patchCall(e.runId, e.callId, (c) => ({ ...c, result: { ok: e.ok, summary: e.summary, ms: e.ms } }));
         break;
       case 'consent.request':
         pushFeed({ id: 'consent-' + e.request.id, kind: 'consent', ts: e.ts, request: e.request });
-        if (!e.request.agentName?.startsWith('Red-team')) set({ consents: [...get().consents, e.request] });
+        if (!replaying && !e.request.agentName?.startsWith('Red-team')) set({ consents: [...get().consents, e.request] });
         break;
       case 'consent.resolved':
         set({
@@ -152,7 +157,7 @@ export const useApp = create<AppState>((set, get) => {
         break;
       case 'agent.message':
         patchRun(e.runId, (r) => ({ ...r, message: e.text }));
-        set({ chat: [...get().chat, { id: nid('m'), role: 'assistant', text: e.text, runId: e.runId, ts: e.ts }] });
+        if (!replaying) set({ chat: [...get().chat, { id: nid('m'), role: 'assistant', text: e.text, runId: e.runId, ts: e.ts }] });
         break;
       case 'run.end':
         patchRun(e.runId, (r) => ({ ...r, receipt: e.receipt, status: 'done' }));
@@ -198,6 +203,25 @@ export const useApp = create<AppState>((set, get) => {
         chat: snap.chat.map((c) => ({ id: nid('m'), role: c.role, text: c.text, runId: c.runId, ts: c.ts })),
         runs: Object.fromEntries(snap.receipts.map((r) => [r.runId, { runId: r.runId, prompt: r.prompt, agent: r.agent, steps: [], calls: [], receipt: r, status: 'done' as const, startedAt: r.startedAt }])),
       });
+      // Rebuild the feed and run traces from recent history so a reload mid-demo loses nothing.
+      try {
+        const past = await client.recentEvents();
+        replaying = true;
+        for (const e of past) {
+          if (e.type === 'run.start' && get().runs[e.runId]) {
+            const r = get().runs[e.runId];
+            set({ runs: { ...get().runs, [e.runId]: { ...r, steps: [], calls: [] } } });
+            continue;
+          }
+          handle(e);
+        }
+      } catch {
+        /* older gateway without history */
+      } finally {
+        replaying = false;
+      }
+      // Runs that were still open in history but have no receipt are not running any more.
+      set({ runs: Object.fromEntries(Object.entries(get().runs).map(([k, r]) => [k, r.status === 'running' && !snap.pendingConsents.some((c) => c.runId === k) ? { ...r, status: 'done' as const } : r])) });
     },
     async refresh() {
       const c = get().client;
@@ -232,6 +256,28 @@ export const useApp = create<AppState>((set, get) => {
     },
     openReceipt(runId) {
       set({ receiptOpen: runId });
+    },
+    replay(runId) {
+      // Re-animate a past run on the flow map from its recorded decisions.
+      const run = get().runs[runId];
+      if (!run) return;
+      const ps: Omit<Packet, 'id' | 'ts'>[] = [];
+      let n = 0;
+      if (run.calls.some((c) => c.egress)) {
+        for (const c of run.calls) {
+          if (!c.egress || c.recipientId === 'self') continue;
+          const blocked = c.egress.verdict === 'blocked';
+          if (!c.egress.decisions.length) ps.push({ category: 'query', recipientId: c.recipientId, outcome: blocked ? 'blocked' : 'query', label: c.tool, delay: n++ * 0.35 });
+          for (const d of c.egress.decisions) ps.push({ category: d.category, recipientId: c.recipientId, outcome: blocked ? 'blocked' : d.action, label: d.itemLabel ?? '', delay: n++ * 0.35 });
+          if (c.ingress && !c.ingress.clean) ps.push({ category: 'query', recipientId: c.recipientId, outcome: 'threat', label: 'injection', delay: n++ * 0.35 });
+        }
+      } else if (run.receipt) {
+        for (const s of run.receipt.shared) ps.push({ category: s.category, recipientId: s.recipientId, outcome: s.form === 'exact' ? 'shared' : 'minimized', label: s.label, delay: n++ * 0.35 });
+        for (const w of run.receipt.withheld) ps.push({ category: w.category, recipientId: w.recipientId, outcome: 'withheld', label: w.label, delay: n++ * 0.35 });
+      }
+      const now = Date.now();
+      // Packets live as long as the replay needs.
+      set({ packets: [...get().packets.filter((p) => now - p.ts < 6000), ...ps.map((p) => ({ ...p, id: nid('rp'), ts: now + p.delay * 1000 - 0 }))].slice(-80) });
     },
     async clearChat() {
       await get().client?.clearChat();

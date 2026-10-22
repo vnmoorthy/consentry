@@ -131,7 +131,7 @@ export default function Connections() {
           })}
         </div>
         <div className="space-y-4 xl:sticky xl:top-6 xl:self-start">
-          <div className="panel ring-gradient p-5">
+          <div className="panel ring-gradient p-5" data-demo="mcp">
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-mint">Protect any agent</div>
             <h3 className="mt-1 font-display text-lg font-bold text-white">Consentry is an MCP server</h3>
             <p className="mt-1 text-[12.5px] text-ink-300">Point Claude Desktop, Claude Code, Cursor or any MCP client at Consentry. Every tool call goes through this firewall, and consent prompts show up here.</p>

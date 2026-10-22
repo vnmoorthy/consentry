@@ -234,7 +234,7 @@ export interface ConsentRequest {
   agentName?: string;
 }
 
-export type LedgerKind = 'egress' | 'ingress' | 'consent' | 'policy' | 'grant' | 'revoke' | 'system' | 'llm';
+export type LedgerKind = 'egress' | 'ingress' | 'consent' | 'policy' | 'grant' | 'revoke' | 'system' | 'llm' | 'request';
 
 export interface LedgerEntry {
   seq: number;
@@ -278,6 +278,8 @@ export interface ToolContext {
   signal?: AbortSignal;
   /** Red-team switches for the simulated partners. */
   scenario?: { poisonReviews?: boolean; imageExfil?: boolean };
+  /** On-device capabilities (tier "self"): nothing leaves the machine. */
+  local?: { draftDeletion(company: string): Promise<DataRequest> };
 }
 
 export interface ToolDef {
@@ -355,6 +357,46 @@ export type RuntimeEvent =
   | { type: 'ledger.append'; entry: LedgerEntry; ts: number }
   | { type: 'state.changed'; scope: 'vault' | 'policies' | 'recipients' | 'tools' | 'settings' | 'ledger' | 'all'; ts: number };
 
+export interface DataRequest {
+  id: string;
+  recipientId: string;
+  recipientName: string;
+  kind: 'deletion';
+  createdAt: number;
+  sentAt?: number;
+  confirmedAt?: number;
+  status: 'drafted' | 'sent' | 'confirmed';
+  to: string;
+  subject: string;
+  letter: string;
+  evidence: { seq: number; hash: string }[];
+}
+
+export type FootprintGroup = 'Identity' | 'Contact' | 'Location' | 'Health' | 'Money' | 'Vehicle';
+export type FootprintState = 'exact' | 'approx' | 'protected';
+
+export interface FootprintRow {
+  recipientId: string;
+  name: string;
+  emoji?: string;
+  tier: Tier;
+  simulated?: boolean;
+  calls: number;
+  lastAt?: number;
+  exact: number;
+  approx: number;
+  protected: number;
+  cells: Partial<Record<FootprintGroup, { state: FootprintState; items: { label: string; form: string; action: Action; count: number }[] }>>;
+  request?: DataRequest['status'];
+}
+
+export interface Footprint {
+  groups: FootprintGroup[];
+  rows: FootprintRow[];
+  totals: { recipients: number; exact: number; approx: number; protected: number; threats: number; blockedCalls: number };
+  timeline: { runId: string; prompt: string; at: number; exact: number; approx: number; withheld: number; threats: number }[];
+}
+
 export interface PersistedState {
   version: number;
   vault: VaultItem[];
@@ -365,6 +407,7 @@ export interface PersistedState {
   stats: Stats;
   chat: ChatTurn[];
   receipts: Receipt[];
+  requests?: DataRequest[];
 }
 
 export interface Store {
@@ -386,6 +429,7 @@ export interface Snapshot {
   ledger: { count: number; head: string };
   chat: ChatTurn[];
   receipts: Receipt[];
+  requests: DataRequest[];
   privacyScore: number;
   mode: 'server' | 'local';
 }

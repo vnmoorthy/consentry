@@ -22,6 +22,7 @@ export interface ToolOutcome {
 }
 
 export interface AgentEnv {
+
   runId: string;
   now: Date;
   vault: VaultItem[];
@@ -138,6 +139,37 @@ export async function autopilot(prompt: string, env: AgentEnv): Promise<string> 
   const allergy = v.find((x) => x.category === 'health.allergy');
   const home = findItem(v, 'home_location') ?? v.find((x) => x.category === 'location.precise');
   const recipientName = (id: string) => env.recipients.find((r) => r.id === id)?.name ?? id;
+
+  // ── "Make them forget me" (fully local) ───────────────────────────────────
+  const deletion = /\b(delete|erase|forget|remove|wipe|purge)\b/i.test(prompt) && /\b(my (data|info\w*|details|records?)|about me|me)\b/i.test(prompt);
+  if (deletion) {
+    const partners = env.recipients.filter((r) => r.tier === 'partner');
+    let target = partners.find((r) => new RegExp(`\\b${r.name.split(' ')[0]}\\b`, 'i').test(prompt));
+    if (!target) {
+      // Default to whoever knows the most about you.
+      const exact = new Map<string, number>();
+      for (const e of env.ledger) if (e.kind === 'egress' && e.recipientId) for (const f of e.fields ?? []) if (f.action !== 'withheld') exact.set(e.recipientId, (exact.get(e.recipientId) ?? 0) + 1);
+      const best = [...exact.entries()].filter(([id]) => partners.some((p) => p.id === id)).sort((a, b) => b[1] - a[1])[0];
+      target = partners.find((p) => p.id === best?.[0]);
+    }
+    if (!target) return "No company has received any of your data yet, so there's nothing to delete. 🎉";
+    env.step(`Drafting a deletion request to ${target.name} from your ledger — on-device, nothing is sent yet`);
+    const o = await env.callTool('request_data_deletion', { company: target.name });
+    if (!o.ok) return `I couldn't draft it: ${o.reason}`;
+    return [
+      `**📨 Deletion request drafted for ${o.data.company}.** It cites ledger entries ${o.data.evidence_entries.map((n: number) => `#${n}`).join(', ')} as evidence of exactly what they received.`,
+      '',
+      '```',
+      `To: ${o.data.to}`,
+      `Subject: ${o.data.subject}`,
+      '',
+      o.data.letter_preview,
+      '…',
+      '```',
+      '',
+      `Open **Footprint → Deletion requests** to review and send it. Sending also revokes the relay aliases and single-use card issued to ${o.data.company}.`,
+    ].join('\n');
+  }
 
   // ── Privacy report (fully local) ──────────────────────────────────────────
   if (intent.privacy) {

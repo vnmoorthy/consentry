@@ -1,24 +1,27 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* "Ember Horizon": warm near-black, slate charcoal, one sunrise on the horizon. */
+  --font-sans: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
-  --color-ink-950: #05060a;
-  --color-ink-900: #0a0c12;
-  --color-ink-850: #0e1118;
-  --color-ink-800: #131722;
-  --color-ink-700: #1b2030;
-  --color-ink-600: #262c3f;
-  --color-ink-500: #3a4258;
-  --color-ink-400: #5b6480;
-  --color-ink-300: #8a93ad;
-  --color-ink-200: #b9c0d4;
-  --color-ink-100: #e3e7f1;
+  --color-ink-950: #0e0f0c;
+  --color-ink-900: #141511;
+  --color-ink-850: #191a16;
+  --color-ink-800: #1f201b;
+  --color-ink-700: #292a24;
+  --color-ink-600: #36372f;
+  --color-ink-500: #4d4c44;
+  --color-ink-400: #7b766c;
+  --color-ink-300: #a7a196;
+  --color-ink-200: #cdc7bb;
+  --color-ink-100: #f2eee7;
 
-  --color-mint: #5eead4;
-  --color-violet: #a78bfa;
+  /* Accent tokens keep their historical names so every component re-themes at once. */
+  --color-mint: #efa56f; /* sunrise ember */
+  --color-violet: #f6d8b4; /* dawn cream */
+  --color-steel: #8ea6bd; /* cool horizon */
   --color-ok: #34d399;
   --color-warn: #fbbf24;
   --color-ask: #60a5fa;
@@ -42,7 +45,7 @@ body {
   color: var(--color-ink-100);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  font-feature-settings: 'cv11', 'ss01';
+  letter-spacing: 0.005em;
 }
 
 body::before {
@@ -51,24 +54,65 @@ body::before {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(900px 500px at 12% -8%, rgba(94, 234, 212, 0.08), transparent 60%),
-    radial-gradient(800px 600px at 100% 0%, rgba(167, 139, 250, 0.08), transparent 60%),
-    radial-gradient(700px 500px at 50% 110%, rgba(96, 165, 250, 0.05), transparent 60%);
+    radial-gradient(900px 320px at 8% 66%, rgba(142, 166, 189, 0.09), transparent 62%),
+    linear-gradient(180deg, #121310 0%, #17181a 58%, #0e0f0c 100%);
   z-index: 0;
+}
+
+/* The horizon: one thin line of light with a slow sunrise drifting along it. */
+.horizon {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1; /* behind content, above the page background, inside the app's stacking context */
+  overflow: hidden;
+}
+.horizon::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 64%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(142, 166, 189, 0.18) 12%, rgba(247, 217, 185, 0.16) 55%, rgba(247, 217, 185, 0.42) 86%, transparent 100%);
+  box-shadow: 0 0 18px rgba(239, 165, 111, 0.12);
+}
+.horizon::after {
+  content: '';
+  position: absolute;
+  top: calc(64% - 220px);
+  left: 60%;
+  width: 760px;
+  height: 440px;
+  background:
+    radial-gradient(closest-side, rgba(247, 217, 185, 0.22), rgba(239, 165, 111, 0.1) 45%, transparent 75%),
+    radial-gradient(40px 3px at 50% 50%, rgba(255, 236, 214, 0.55), transparent);
+  filter: blur(6px);
+  animation: sunrise 48s ease-in-out infinite alternate;
+}
+@keyframes sunrise {
+  0% {
+    transform: translateX(-12vw) scale(0.9);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateX(18vw) scale(1.08);
+    opacity: 1;
+  }
 }
 
 .grid-bg {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(rgba(255, 240, 225, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 240, 225, 0.022) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
 .panel {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(180deg, rgba(255, 244, 232, 0.034), rgba(255, 244, 232, 0.012));
+  border: 1px solid rgba(255, 238, 220, 0.075);
   border-radius: 18px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 20px 50px -30px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 1px 0 rgba(255, 240, 225, 0.04) inset, 0 24px 60px -34px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
 }
 
@@ -79,7 +123,7 @@ body::before {
 }
 
 .text-gradient {
-  background: linear-gradient(92deg, #5eead4 0%, #93c5fd 45%, #a78bfa 100%);
+  background: linear-gradient(92deg, #f6d8b4 0%, #efa56f 55%, #e07b39 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -94,7 +138,7 @@ body::before {
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(94, 234, 212, 0.6), rgba(167, 139, 250, 0.6));
+  background: linear-gradient(135deg, rgba(246, 216, 180, 0.55), rgba(224, 123, 57, 0.55));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -130,9 +174,9 @@ body::before {
   cursor: not-allowed;
 }
 .btn-primary {
-  background: linear-gradient(135deg, #5eead4, #8b9cfb);
-  color: #05060a;
-  box-shadow: 0 8px 30px -10px rgba(94, 234, 212, 0.6);
+  background: linear-gradient(135deg, #f6dcbd, #efa56f);
+  color: #1a130c;
+  box-shadow: 0 10px 34px -12px rgba(239, 165, 111, 0.55);
 }
 .btn-primary:hover:not(:disabled) {
   filter: brightness(1.08);
@@ -167,18 +211,18 @@ body::before {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .input:focus {
-  border-color: rgba(94, 234, 212, 0.55);
-  box-shadow: 0 0 0 4px rgba(94, 234, 212, 0.08);
+  border-color: rgba(239, 165, 111, 0.55);
+  box-shadow: 0 0 0 4px rgba(239, 165, 111, 0.09);
 }
 select.input {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a93ad' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a7a196' stroke-width='2.5'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.8rem center;
   padding-right: 2.2rem;
 }
 select.input option {
-  background: #0e1118;
+  background: #191a16;
 }
 
 .kbd {
@@ -292,4 +336,30 @@ select.input option {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Demo tour spotlight */
+@keyframes demoPulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(239, 165, 111, 0.95), 0 0 0 8px rgba(239, 165, 111, 0.18); }
+  50% { box-shadow: 0 0 0 2px rgba(246, 216, 180, 0.95), 0 0 0 14px rgba(246, 216, 180, 0.08); }
+}
+.demo-highlight {
+  animation: demoPulse 1.8s ease-in-out infinite;
+  position: relative;
+  z-index: 5;
+}
+
+/* Work Sans reads best a touch lighter and tighter for headings. */
+.font-display {
+  letter-spacing: -0.012em;
+}
+.font-display.font-bold,
+.font-display.font-extrabold {
+  font-weight: 600;
+}
+.wordmark {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
 }

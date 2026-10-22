@@ -1,6 +1,6 @@
 import {
   ConsentryRuntime, REDTEAM_CATALOG, type CategoryId, type CompiledPolicy, type ConsentDecision, type LedgerEntry, type LedgerVerification,
-  type PolicyRule, type Purpose, type RedTeamReport, type RuntimeEvent, type Settings, type Snapshot, type Tier, type VaultItem,
+  type DataRequest, type Footprint, type PolicyRule, type Purpose, type RedTeamReport, type RuntimeEvent, type Settings, type Snapshot, type Tier, type VaultItem,
 } from '@consentry/core';
 import { BrowserStore } from './localStore';
 
@@ -35,6 +35,10 @@ export interface ConsentryClient {
   runRedTeam(id: string): Promise<RedTeamReport>;
   updateSettings(patch: Partial<Settings> & { apiKey?: string }): Promise<void>;
   reset(): Promise<void>;
+  footprint(): Promise<Footprint>;
+  recentEvents(): Promise<RuntimeEvent[]>;
+  draftDeletion(recipientId: string): Promise<DataRequest>;
+  sendRequest(id: string): Promise<DataRequest>;
 }
 
 async function j<T>(res: Response): Promise<T> {
@@ -91,6 +95,10 @@ export class ServerClient implements ConsentryClient {
   runRedTeam = (id: string) => post(`${this.base}/api/redteam/${id}`).then((r) => j<RedTeamReport>(r));
   updateSettings = (patch: any) => fetch(`${this.base}/api/settings`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(patch) }).then((r) => j(r)).then(() => undefined);
   reset = () => post(`${this.base}/api/reset`).then(() => undefined);
+  footprint = () => fetch(`${this.base}/api/footprint`).then((r) => j<Footprint>(r));
+  recentEvents = () => fetch(`${this.base}/api/recent-events`).then((r) => j<RuntimeEvent[]>(r));
+  draftDeletion = (recipientId: string) => post(`${this.base}/api/requests`, { recipientId }).then((r) => j<DataRequest>(r));
+  sendRequest = (id: string) => post(`${this.base}/api/requests/${id}/send`).then((r) => j<DataRequest>(r));
 }
 
 /** Local-first: the full Consentry runtime runs inside this browser tab. Nothing leaves except consented tool calls. */
@@ -133,6 +141,10 @@ export class LocalClient implements ConsentryClient {
   runRedTeam = (id: string) => this.rt.runRedTeam(id);
   updateSettings = async (patch: any) => void this.rt.updateSettings(patch);
   reset = () => this.rt.reset();
+  footprint = async () => this.rt.footprint();
+  recentEvents = async () => this.rt.recentEvents.slice(-150);
+  draftDeletion = (recipientId: string) => this.rt.draftDeletion(recipientId);
+  sendRequest = (id: string) => this.rt.sendRequest(id);
 }
 
 let connecting: Promise<ConsentryClient> | null = null;

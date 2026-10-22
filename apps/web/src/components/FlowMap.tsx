@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { CategoryId, Recipient } from '@consentry/core';
 import { useApp, type Packet } from '../lib/store';
 
@@ -59,6 +60,13 @@ const ORDER = ['claude', 'open-meteo', 'nws', 'usgs', 'nhtsa', 'openfda', 'fema'
 export function FlowMap({ compact = false }: { compact?: boolean }) {
   const snap = useApp((s) => s.snap);
   const packets = useApp((s) => s.packets);
+  const nav = useNavigate();
+  const feed = useApp((s) => s.feed);
+  const counts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const f of feed) if (f.kind === 'egress') m.set(f.recipientId, (m.get(f.recipientId) ?? 0) + f.result.decisions.filter((d) => d.action !== 'withheld').length);
+    return m;
+  }, [feed]);
   const [, tick] = useState(0);
   useEffect(() => {
     const t = setInterval(() => tick((x) => x + 1), 1000);
@@ -87,16 +95,16 @@ export function FlowMap({ compact = false }: { compact?: boolean }) {
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ maxHeight: compact ? 300 : 440 }}>
         <defs>
           <radialGradient id="shieldGlow">
-            <stop offset="0" stopColor="#5eead4" stopOpacity="0.35" />
-            <stop offset="1" stopColor="#5eead4" stopOpacity="0" />
+            <stop offset="0" stopColor="#efa56f" stopOpacity="0.34" />
+            <stop offset="1" stopColor="#efa56f" stopOpacity="0" />
           </radialGradient>
           <radialGradient id="shieldGlowBad">
             <stop offset="0" stopColor="#fb7185" stopOpacity="0.45" />
             <stop offset="1" stopColor="#fb7185" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="shieldStroke" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#5eead4" />
-            <stop offset="1" stopColor="#a78bfa" />
+            <stop offset="0" stopColor="#f6d8b4" />
+            <stop offset="1" stopColor="#e07b39" />
           </linearGradient>
           <filter id="blur4">
             <feGaussianBlur stdDeviation="3" />
@@ -105,10 +113,10 @@ export function FlowMap({ compact = false }: { compact?: boolean }) {
 
         {/* wires */}
         {GROUPS.map((g) => (
-          <path key={g.id} d={bezier({ x: LEFT_X + 16, y: leftPos[g.id].y }, SHIELD).d} stroke={hotLeft.has(g.id) ? g.color : 'rgba(255,255,255,0.07)'} strokeOpacity={hotLeft.has(g.id) ? 0.55 : 1} strokeWidth={hotLeft.has(g.id) ? 1.6 : 1} fill="none" style={{ transition: 'all .4s' }} />
+          <path key={g.id} d={bezier({ x: LEFT_X + 16, y: leftPos[g.id].y }, SHIELD).d} stroke={hotLeft.has(g.id) ? g.color : 'rgba(255,240,225,0.07)'} strokeOpacity={hotLeft.has(g.id) ? 0.55 : 1} strokeWidth={hotLeft.has(g.id) ? 1.6 : 1} fill="none" style={{ transition: 'all .4s' }} />
         ))}
         {recipients.map((r) => (
-          <path key={r.id} d={bezier(SHIELD, { x: RIGHT_X - 16, y: rightPos[r.id].y }).d} stroke={hotRight.get(r.id) ?? 'rgba(255,255,255,0.06)'} strokeOpacity={hotRight.has(r.id) ? 0.6 : 1} strokeWidth={hotRight.has(r.id) ? 1.6 : 1} strokeDasharray={r.tier === 'unknown' ? '3 4' : undefined} fill="none" style={{ transition: 'all .4s' }} />
+          <path key={r.id} d={bezier(SHIELD, { x: RIGHT_X - 16, y: rightPos[r.id].y }).d} stroke={hotRight.get(r.id) ?? 'rgba(255,240,225,0.06)'} strokeOpacity={hotRight.has(r.id) ? 0.6 : 1} strokeWidth={hotRight.has(r.id) ? 1.6 : 1} strokeDasharray={r.tier === 'unknown' ? '3 4' : undefined} fill="none" style={{ transition: 'all .4s' }} />
         ))}
 
         {/* left nodes */}
@@ -117,9 +125,10 @@ export function FlowMap({ compact = false }: { compact?: boolean }) {
           const hot = hotLeft.has(g.id);
           return (
             <g key={g.id}>
+              <title>{`${g.label}: ${hot ? 'moving right now' : 'idle'}`}</title>
               <circle cx={p.x + 16} cy={p.y} r={hot ? 6 : 4} fill={g.color} opacity={hot ? 1 : 0.45} style={{ transition: 'all .3s' }} />
               {hot && <circle cx={p.x + 16} cy={p.y} r={11} fill={g.color} opacity={0.18} filter="url(#blur4)" />}
-              <text x={p.x} y={p.y + 4} textAnchor="end" fontSize="12" fontWeight={600} fill={hot ? '#fff' : '#8a93ad'} fontFamily="Inter" style={{ transition: 'fill .3s' }}>
+              <text x={p.x} y={p.y + 4} textAnchor="end" fontSize="12" fontWeight={600} fill={hot ? '#fff' : '#a7a196'} fontFamily="Work Sans" style={{ transition: 'fill .3s' }}>
                 {g.label}
               </text>
             </g>
@@ -131,9 +140,11 @@ export function FlowMap({ compact = false }: { compact?: boolean }) {
           const p = rightPos[r.id];
           const hot = hotRight.get(r.id);
           return (
-            <g key={r.id}>
-              <circle cx={p.x - 16} cy={p.y} r={hot ? 5.5 : 3.5} fill={hot ?? (r.tier === 'unknown' ? '#fb7185' : '#5b6480')} opacity={hot ? 1 : 0.6} style={{ transition: 'all .3s' }} />
-              <text x={p.x - 4} y={p.y + 4} fontSize="11" fontWeight={hot ? 650 : 500} fill={hot ? '#fff' : '#8a93ad'} fontFamily="Inter" style={{ transition: 'fill .3s' }}>
+            <g key={r.id} onClick={() => nav('/footprint')} style={{ cursor: 'pointer' }}>
+              <title>{`${r.name} (${r.domain === '*' ? 'unverified domains' : r.domain}): ${counts.get(r.id) ?? 0} personal field(s) received this session. Click for the full footprint.`}</title>
+              <rect x={p.x - 24} y={p.y - 10} width={130} height={20} fill="transparent" />
+              <circle cx={p.x - 16} cy={p.y} r={hot ? 5.5 : 3.5} fill={hot ?? (r.tier === 'unknown' ? '#fb7185' : '#77736a')} opacity={hot ? 1 : 0.6} style={{ transition: 'all .3s' }} />
+              <text x={p.x - 4} y={p.y + 4} fontSize="11" fontWeight={hot ? 650 : 500} fill={hot ? '#fff' : '#a7a196'} fontFamily="Work Sans" style={{ transition: 'fill .3s' }}>
                 {r.emoji} {r.name.replace(' (LLM)', '').replace(' Insurance', '').replace(' Pharmacy', '')}
                 {r.simulated ? ' ·sim' : ''}
               </text>
@@ -144,13 +155,13 @@ export function FlowMap({ compact = false }: { compact?: boolean }) {
         {/* shield */}
         <circle cx={SHIELD.x} cy={SHIELD.y} r={74} fill={`url(#${anyBlocked ? 'shieldGlowBad' : 'shieldGlow'})`} />
         <motion.circle cx={SHIELD.x} cy={SHIELD.y} r={46} fill="none" stroke="url(#shieldStroke)" strokeOpacity={0.25} strokeWidth={1} animate={{ r: [44, 54, 44], opacity: [0.6, 0.15, 0.6] }} transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }} />
-        <circle cx={SHIELD.x} cy={SHIELD.y} r={38} fill="#0b0d14" stroke="url(#shieldStroke)" strokeWidth={1.5} />
+        <circle cx={SHIELD.x} cy={SHIELD.y} r={38} fill="#141511" stroke="url(#shieldStroke)" strokeWidth={1.5} />
         <g transform={`translate(${SHIELD.x - 17}, ${SHIELD.y - 20}) scale(0.53)`}>
           <path d="M32 9 51 16v14c0 12.5-8.2 21.6-19 25-10.8-3.4-19-12.5-19-25V16Z" fill="none" stroke="url(#shieldStroke)" strokeWidth="4.5" strokeLinejoin="round" />
           <circle cx="32" cy="29" r="5" fill="url(#shieldStroke)" />
           <path d="M32 33v9" stroke="url(#shieldStroke)" strokeWidth="4.5" strokeLinecap="round" />
         </g>
-        <text x={SHIELD.x} y={SHIELD.y + 58} textAnchor="middle" fontSize="11" fontWeight={700} letterSpacing="2" fill="#5eead4" fontFamily="Inter Tight">
+        <text x={SHIELD.x} y={SHIELD.y + 58} textAnchor="middle" fontSize="11" fontWeight={500} letterSpacing="3.2" fill="#efa56f" fontFamily="Work Sans">
           CONSENTRY
         </text>
 

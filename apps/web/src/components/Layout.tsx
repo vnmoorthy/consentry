@@ -2,15 +2,17 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { Bot, Cpu, KeyRound, Laptop, Menu, Plug, Radar, ScrollText, Server, Settings, ShieldCheck, Skull, Vault, X } from 'lucide-react';
+import { Bot, Cpu, Footprints, KeyRound, Laptop, Menu, Plug, Radar, ScrollText, Server, Settings, ShieldCheck, Skull, Vault, X } from 'lucide-react';
 import { useApp } from '../lib/store';
 import { GithubIcon, Logo, ScoreRing } from './ui';
 import { ConsentModal } from './ConsentModal';
 import { ReceiptModal } from './ReceiptModal';
 import { Welcome } from './Welcome';
+import { DemoDirector } from './DemoDirector';
 
 const NAV = [
   { to: '/', label: 'Command Center', icon: Radar },
+  { to: '/footprint', label: 'Footprint', icon: Footprints },
   { to: '/vault', label: 'Vault', icon: Vault },
   { to: '/policies', label: 'Policies', icon: KeyRound },
   { to: '/ledger', label: 'Ledger', icon: ScrollText },
@@ -60,8 +62,8 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
       <div className="flex items-center gap-3 px-5 pb-6 pt-6">
         <Logo size={36} />
         <div>
-          <div className="font-display text-lg font-bold tracking-tight text-white">Consentry</div>
-          <div className="text-[10.5px] font-medium uppercase tracking-[0.16em] text-ink-400">Consent firewall</div>
+          <div className="wordmark text-[15px] text-white">Consentry</div>
+          <div className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.2em] text-ink-400">Consent firewall</div>
         </div>
       </div>
       <nav className="flex-1 space-y-0.5 px-3">
@@ -82,7 +84,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
                 <span className="flex-1">{label}</span>
                 {to === '/' && consents.length > 0 && <span className="rounded-full bg-sky-400 px-1.5 text-[10px] font-bold text-ink-950">{consents.length}</span>}
                 {to === '/ledger' && snap && (
-                  <motion.span key={pulse} initial={{ scale: 1.4, color: '#5eead4' }} animate={{ scale: 1, color: '#5b6480' }} className="font-mono text-[10.5px]">
+                  <motion.span key={pulse} initial={{ scale: 1.4, color: '#efa56f' }} animate={{ scale: 1, color: '#77736a' }} className="font-mono text-[10.5px]">
                     {snap.ledger.count}
                   </motion.span>
                 )}
@@ -138,7 +140,8 @@ export function Layout() {
   }, [loc.pathname]);
   return (
     <div className="relative z-10 flex h-full">
-      <aside className="hidden w-[248px] shrink-0 border-r border-white/[0.06] bg-ink-950/60 backdrop-blur-xl lg:block">
+      <div className="horizon" aria-hidden />
+      <aside className="hidden w-[248px] shrink-0 border-r border-white/[0.06] bg-ink-950/70 backdrop-blur-xl lg:block">
         <SidebarBody />
       </aside>
       <AnimatePresence>
@@ -171,6 +174,7 @@ export function Layout() {
       <ReceiptModal />
       <Toasts />
       <Welcome />
+      <DemoDirector />
     </div>
   );
 }

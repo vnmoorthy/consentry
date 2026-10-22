@@ -11,7 +11,7 @@ function Sensitivity({ n }: { n: number }) {
   return (
     <div className="flex gap-0.5" title={`Sensitivity ${n}/5`}>
       {[1, 2, 3, 4, 5].map((i) => (
-        <span key={i} className="h-1.5 w-3 rounded-full" style={{ background: i <= n ? (n >= 5 ? '#fb7185' : n >= 4 ? '#fbbf24' : '#5eead4') : 'rgba(255,255,255,0.08)' }} />
+        <span key={i} className="h-1.5 w-3 rounded-full" style={{ background: i <= n ? (n >= 5 ? '#fb7185' : n >= 4 ? '#fbbf24' : '#8ea6bd') : 'rgba(255,240,225,0.08)' }} />
       ))}
     </div>
   );
@@ -170,7 +170,7 @@ export default function Vault() {
           </button>
         }
       />
-      <div className="panel mb-6 flex flex-wrap items-center gap-4 p-4 text-[12.5px] text-ink-300">
+      <div className="panel mb-6 flex flex-wrap items-center gap-4 p-4 text-[12.5px] text-ink-300" data-demo="vault-banner">
         <Lock size={18} className="text-mint" />
         <div className="min-w-0 flex-1">
           Your agent never sees these values. It uses tokens like <span className="rounded bg-violet-400/15 px-1.5 py-0.5 font-mono text-violet-200">{'{{vault:home_location}}'}</span>, and Consentry resolves each token at the network boundary only if your policy allows that recipient, purpose and form.

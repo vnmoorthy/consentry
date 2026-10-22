@@ -7,12 +7,12 @@ import { useApp, recipientName } from '../lib/store';
 import { ActionTag, PageHeader, Spinner, VerdictPill, fmtTime, timeAgo } from '../components/ui';
 
 const KIND_ICON: Record<string, typeof ScrollText> = { egress: UploadCloud, ingress: ShieldAlert, consent: Hand, policy: KeyRound, grant: Sparkles, revoke: Undo2, system: ScrollText, llm: Bot };
-const KIND_COLOR: Record<string, string> = { egress: '#5eead4', ingress: '#fb7185', consent: '#60a5fa', policy: '#a78bfa', grant: '#34d399', revoke: '#fbbf24', system: '#8a93ad', llm: '#c4b5fd' };
+const KIND_COLOR: Record<string, string> = { egress: '#efa56f', ingress: '#fb7185', consent: '#60a5fa', policy: '#a78bfa', grant: '#34d399', revoke: '#fbbf24', system: '#a7a196', llm: '#c4b5fd' };
 
 function blockColor(e: LedgerEntry) {
   if (e.verdict === 'blocked' || e.verdict === 'quarantined') return '#fb7185';
   if (e.kind === 'egress') return e.verdict === 'minimized' ? '#fbbf24' : e.verdict === 'consented' ? '#60a5fa' : '#34d399';
-  return KIND_COLOR[e.kind] ?? '#8a93ad';
+  return KIND_COLOR[e.kind] ?? '#a7a196';
 }
 
 export default function Ledger() {
@@ -91,10 +91,10 @@ export default function Ledger() {
         subtitle="Append-only · SHA-256 hash chain over canonical JSON · stores masked values and payload digests, never your raw data"
         actions={
           <>
-            <button className="btn btn-primary" onClick={runVerify} disabled={!!busy}>
+            <button className="btn btn-primary" onClick={runVerify} disabled={!!busy} data-demo="verify">
               {busy === 'verify' ? <Spinner /> : <ShieldCheck size={15} />} Verify chain
             </button>
-            <button className="btn btn-danger" onClick={tamper} disabled={!!busy} title="Simulate an insider editing history">
+            <button className="btn btn-danger" onClick={tamper} disabled={!!busy} title="Simulate an insider editing history" data-demo="tamper">
               {busy === 'tamper' ? <Spinner /> : <FileWarning size={15} />} Tamper (demo)
             </button>
             {verify && !verify.ok && (

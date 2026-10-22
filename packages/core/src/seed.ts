@@ -35,6 +35,7 @@ export function seedVault(): VaultItem[] {
 
 export function seedRecipients(): Recipient[] {
   return [
+    { id: 'self', name: 'On-device', domain: 'localhost', tier: 'self', description: 'Runs inside Consentry on your device. Nothing leaves.', color: '#34d399', emoji: '🔐' },
     { id: 'claude', name: 'Claude (LLM)', domain: 'api.anthropic.com', tier: 'llm', description: 'The model that plans and writes for your agent.', retention: 'Per your Anthropic org settings', color: '#d4a27f', emoji: '✳️' },
     { id: 'open-meteo', name: 'Open-Meteo', domain: 'api.open-meteo.com', tier: 'open-data', description: 'Open-source weather, air quality and geocoding APIs.', retention: 'No account; standard request logs', color: '#2dd4bf', emoji: '🌤️' },
     { id: 'nws', name: 'National Weather Service', domain: 'api.weather.gov', tier: 'public-sector', description: 'Official US weather alerts (NOAA).', retention: 'Federal logs; no account', color: '#38bdf8', emoji: '⛈️' },

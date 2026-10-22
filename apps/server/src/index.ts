@@ -120,6 +120,11 @@ app.get('/api/ledger/export', (c) => {
   return c.json(rt.exportLedger());
 });
 
+// Footprint & data-subject requests
+app.get('/api/footprint', (c) => c.json(rt.footprint()));
+app.post('/api/requests', async (c) => c.json(await rt.draftDeletion(String((await body(c)).recipientId ?? ''))));
+app.post('/api/requests/:id/send', async (c) => c.json(await rt.sendRequest(c.req.param('id'))));
+
 // Connections
 app.post('/api/tools/:name/toggle', async (c) => (rt.toggleTool(c.req.param('name'), !!(await body(c)).enabled), c.json({ ok: true })));
 app.post('/api/recipients/:id/tier', async (c) => (rt.setRecipientTier(c.req.param('id'), (await body(c)).tier), c.json({ ok: true })));

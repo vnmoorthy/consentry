@@ -8,6 +8,7 @@ import { Layout } from './components/Layout';
 import { Logo } from './components/ui';
 import Command from './pages/Command';
 import Vault from './pages/Vault';
+import Footprint from './pages/Footprint';
 import Policies from './pages/Policies';
 import Ledger from './pages/Ledger';
 import Connections from './pages/Connections';
@@ -39,6 +40,7 @@ function Boot() {
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Command />} />
+          <Route path="footprint" element={<Footprint />} />
           <Route path="vault" element={<Vault />} />
           <Route path="policies" element={<Policies />} />
           <Route path="ledger" element={<Ledger />} />

@@ -1,5 +1,5 @@
 import type {
-  CategoryId, ChatTurn, ConsentDecision, ConsentRequest, EgressResult, FieldDecision, LedgerEntry, MaskedVaultItem,
+  CategoryId, ChatTurn, ConsentDecision, DataRequest, Footprint, ConsentRequest, EgressResult, FieldDecision, LedgerEntry, MaskedVaultItem,
   PersistedState, PolicyRule, Purpose, Receipt, Recipient, RuntimeEvent, Settings, Snapshot, Store, Tier, ToolCall,
   ToolContext, ToolDef, VaultItem,
 } from './types';
@@ -15,6 +15,7 @@ import { applyTransform, defaultTransform } from './transforms';
 import { TOKEN_RE } from './detect';
 import { clone, maskValue, truncate, uid } from './util';
 import { REDTEAM, type RedTeamReport } from './redteam';
+import { computeFootprint, draftDeletionLetter } from './footprint';
 
 export interface RuntimeOptions {
   store: Store;
@@ -74,6 +75,9 @@ export class ConsentryRuntime {
       await rt.systemEntry('Consentry initialized with privacy-first default policies');
       await rt.persistNow();
     }
+    // Forward-migrate saved state: new built-in recipients (e.g. the on-device "self" tier) and fields.
+    for (const r of seedRecipients()) if (!rt.state.recipients.some((x) => x.id === r.id)) rt.state.recipients.unshift(r);
+    rt.state.requests ??= [];
     // A key in the environment makes Claude the default brain, unless the user picked one in Settings
     // (or CONSENTRY_AGENT pins it).
     const s = rt.state.settings;
@@ -95,6 +99,7 @@ export class ConsentryRuntime {
       stats: seedStats(),
       chat: [],
       receipts: [],
+      requests: [],
     };
   }
 
@@ -182,6 +187,7 @@ export class ConsentryRuntime {
       ledger: { count: this.ledger.entries.length, head: this.ledger.head },
       chat: this.state.chat.slice(-40),
       receipts: this.state.receipts.slice(-30),
+      requests: (this.state.requests ?? []).slice(-30),
       privacyScore: this.privacyScore(),
       mode: this.mode,
     };
@@ -311,7 +317,7 @@ export class ConsentryRuntime {
     const timer = setTimeout(() => ac.abort(), 15000);
     let result;
     try {
-      result = await tool.run(egress.sanitizedArgs, { fetch: this.fetchImpl, signal: ac.signal, scenario: ctx.scenario });
+      result = await tool.run(egress.sanitizedArgs, { fetch: this.fetchImpl, signal: ac.signal, scenario: ctx.scenario, local: { draftDeletion: (company) => this.draftDeletion(this.resolvePartner(company)) } });
     } catch (err: any) {
       result = { ok: false, error: err?.name === 'AbortError' ? 'timed out' : String(err?.message ?? err), summary: 'Request failed' };
     } finally {
@@ -635,6 +641,52 @@ export class ConsentryRuntime {
 
   exportLedger() {
     return { exportedAt: new Date().toISOString(), head: this.ledger.head, count: this.ledger.entries.length, algorithm: 'SHA-256 hash chain over canonical JSON', entries: this.ledger.entries };
+  }
+
+  // ───────────────────────────── footprint & data requests ─────────────────────────────
+
+  footprint(): Footprint {
+    return computeFootprint(this.ledger.entries, this.state.recipients, this.state.receipts, this.state.requests ?? []);
+  }
+
+  /** "TableTap", "tabletap", "the restaurant app"… → recipient id. */
+  resolvePartner(nameOrId: string): string {
+    const q = nameOrId.toLowerCase().trim();
+    const partners = this.state.recipients.filter((r) => r.tier === 'partner');
+    const hit = partners.find((r) => r.id === q || r.name.toLowerCase() === q || q.includes(r.name.toLowerCase().split(' ')[0]) || r.name.toLowerCase().includes(q));
+    return hit?.id ?? q;
+  }
+
+  async draftDeletion(recipientId: string): Promise<DataRequest> {
+    const recipient = this.state.recipients.find((r) => r.id === recipientId);
+    if (!recipient) throw new Error('Unknown recipient');
+    if (recipient.tier !== 'partner') throw new Error(`${recipient.name} keeps no account for you, so there is nothing to delete`);
+    const req: DataRequest = { id: uid('dsr_'), recipientId, recipientName: recipient.name, kind: 'deletion', createdAt: Date.now(), status: 'drafted', ...draftDeletionLetter(recipient, this.ledger.entries, this.state.vault, this.ledger.head) };
+    (this.state.requests ??= []).push(req);
+    await this.systemEntry(`Deletion request drafted for ${recipient.name} (cites ${req.evidence.length} ledger entries)`, 'request', { recipientId });
+    this.changed('all');
+    return req;
+  }
+
+  async sendRequest(id: string): Promise<DataRequest> {
+    const req = (this.state.requests ?? []).find((r) => r.id === id);
+    if (!req) throw new Error('Unknown request');
+    if (req.status !== 'drafted') return req;
+    req.status = 'sent';
+    req.sentAt = Date.now();
+    const recipient = this.state.recipients.find((r) => r.id === req.recipientId);
+    await this.systemEntry(`Deletion request sent to ${req.recipientName}${recipient?.simulated ? ' (simulated partner)' : ''}; relay aliases & single-use cards revoked`, 'request', { recipientId: req.recipientId });
+    this.changed('all');
+    if (recipient?.simulated) {
+      // Simulated partners acknowledge quickly so the full lifecycle is demonstrable on stage.
+      setTimeout(async () => {
+        req.status = 'confirmed';
+        req.confirmedAt = Date.now();
+        await this.systemEntry(`${req.recipientName} confirmed deletion (simulated)`, 'request', { recipientId: req.recipientId, verdict: 'confirmed' });
+        this.changed('all');
+      }, 2600);
+    }
+    return req;
   }
 
   // ───────────────────────────── connections ─────────────────────────────

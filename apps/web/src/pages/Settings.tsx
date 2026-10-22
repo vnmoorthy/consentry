@@ -152,7 +152,7 @@ export default function Settings() {
                 location.reload();
               }}
             >
-              Show welcome tour
+              Show welcome screen
             </button>
           </div>
         </section>

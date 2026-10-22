@@ -92,7 +92,7 @@ function Composer() {
     setText('');
   };
   return (
-    <div className="panel ring-gradient p-5">
+    <div className="panel ring-gradient p-5" data-demo="composer">
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-mint">
         <Wand2 size={13} /> Write a rule in plain English
       </div>

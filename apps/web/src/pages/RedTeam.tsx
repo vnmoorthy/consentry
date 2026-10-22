@@ -89,7 +89,7 @@ export default function RedTeam() {
         icon={<Swords size={20} />}
         subtitle="Attack your own agent. Every scenario runs through the real firewall, ledger and tools."
         actions={
-          <button className="btn btn-primary" onClick={runAll} disabled={!!running || !catalog.length}>
+          <button className="btn btn-primary" onClick={runAll} disabled={!!running || !catalog.length} data-demo="run-all">
             {all ? <Spinner /> : <Play size={15} />} Run all {catalog.length} attacks
           </button>
         }

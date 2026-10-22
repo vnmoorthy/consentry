@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Play } from 'lucide-react';
 import { CATEGORIES } from '@consentry/core';
 import { useApp, recipientName } from '../lib/store';
 import { Modal } from './ui';
@@ -29,6 +31,8 @@ export function ReceiptModal() {
   const run = useApp((s) => (runId ? s.runs[runId] : undefined));
   const snap = useApp((s) => s.snap);
   const client = useApp((s) => s.client);
+  const replay = useApp((s) => s.replay);
+  const nav = useNavigate();
   const [verified, setVerified] = useState<boolean | null>(null);
   const r = run?.receipt;
 
@@ -89,6 +93,16 @@ export function ReceiptModal() {
             {verified === null ? 'VERIFYING CHAIN…' : verified ? '✓ HASH CHAIN VERIFIED' : '✗ CHAIN BROKEN — TAMPERING DETECTED'}
           </div>
           <div className="mt-1 text-center text-[9.5px] text-[#666]">Your data. Your rules. Your receipt.</div>
+          <button
+            onClick={() => {
+              close(null);
+              nav('/');
+              setTimeout(() => replay(r.runId), 350);
+            }}
+            className="mx-auto mt-4 flex items-center gap-1.5 rounded-full border border-[#1c1c1c]/25 px-3 py-1 font-sans text-[11px] font-semibold text-[#1c1c1c] hover:bg-[#1c1c1c]/5"
+          >
+            <Play size={11} /> Replay on the flow map
+          </button>
         </div>
       )}
     </Modal>

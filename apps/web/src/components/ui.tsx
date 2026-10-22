@@ -25,14 +25,14 @@ export function Logo({ size = 32, glow = true }: { size?: number; glow?: boolean
   // Unique gradient id per instance: a duplicate id inside a hidden subtree would render the logo blank.
   const id = 'lg' + useId().replace(/:/g, '');
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" className={glow ? 'drop-shadow-[0_0_18px_rgba(94,234,212,0.35)]' : ''}>
+    <svg width={size} height={size} viewBox="0 0 64 64" className={glow ? 'drop-shadow-[0_0_18px_rgba(239,165,111,0.32)]' : ''}>
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#5eead4" />
-          <stop offset="1" stopColor="#a78bfa" />
+          <stop offset="0" stopColor="#f6d8b4" />
+          <stop offset="1" stopColor="#e07b39" />
         </linearGradient>
       </defs>
-      <rect width="64" height="64" rx="16" fill="#0b0d14" />
+      <rect width="64" height="64" rx="16" fill="#141511" />
       <rect x="0.5" y="0.5" width="63" height="63" rx="15.5" fill="none" stroke="rgba(255,255,255,0.08)" />
       <path d="M32 9 51 16v14c0 12.5-8.2 21.6-19 25-10.8-3.4-19-12.5-19-25V16Z" fill="none" stroke={`url(#${id})`} strokeWidth="4" strokeLinejoin="round" />
       <circle cx="32" cy="29" r="5" fill={`url(#${id})`} />
@@ -150,7 +150,7 @@ export function ScoreRing({ value, size = 56, stroke = 5, label }: { value: numb
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(255,255,255,0.08)" strokeWidth={stroke} fill="none" />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="rgba(255,240,225,0.08)" strokeWidth={stroke} fill="none" />
         <motion.circle cx={size / 2} cy={size / 2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} initial={{ strokeDashoffset: c }} animate={{ strokeDashoffset: c * (1 - value / 100) }} transition={{ duration: 1.2, ease: 'easeOut' }} />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">

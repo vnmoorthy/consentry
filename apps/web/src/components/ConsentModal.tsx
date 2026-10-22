@@ -38,7 +38,7 @@ export function ConsentModal() {
       {req && (
         <motion.div key={req.id} className="fixed inset-0 z-[60] flex items-end justify-center p-4 sm:items-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <motion.div initial={{ y: 40, scale: 0.96, opacity: 0 }} animate={{ y: 0, scale: 1, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ type: 'spring', stiffness: 360, damping: 30 }} className="ring-gradient relative w-full max-w-md overflow-hidden rounded-3xl bg-ink-900 shadow-[0_30px_120px_-20px_rgba(94,234,212,0.35)]">
+          <motion.div initial={{ y: 40, scale: 0.96, opacity: 0 }} animate={{ y: 0, scale: 1, opacity: 1 }} exit={{ y: 20, opacity: 0 }} transition={{ type: 'spring', stiffness: 360, damping: 30 }} className="ring-gradient relative w-full max-w-md overflow-hidden rounded-3xl bg-ink-900 shadow-[0_30px_120px_-20px_rgba(239,165,111,0.32)]">
             <div className="h-1 w-full bg-white/5">
               <motion.div className="h-full bg-gradient-to-r from-mint to-violet" style={{ width: `${(left / total) * 100}%` }} />
             </div>

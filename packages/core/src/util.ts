@@ -88,8 +88,10 @@ export function maskValue(value: string, category: string): string {
   if (category === 'identity.dob') return '••/••/' + v.slice(0, 4);
   if (category === 'identity.name') return v.split(/\s+/).map((p) => p[0] + '•'.repeat(Math.max(1, p.length - 1))).join(' ');
   if (category === 'location.precise') {
-    if (/^-?\d/.test(v)) return v.replace(/(\.\d)\d+/g, '$1••');
-    return '•••• ' + v.split(',').slice(1).join(',').trim();
+    if (/^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(v)) return v.replace(/(\.\d)\d+/g, '$1••');
+    // Street address: hide the street line, keep the city so the owner recognises it.
+    const parts = v.split(',').map((p) => p.trim());
+    return '•••• ' + (parts.length > 2 ? parts.slice(-2).join(', ') : parts.slice(1).join(', ') || '••••');
   }
   if (category.startsWith('health') || category === 'secret.credential') return v[0] + '•'.repeat(Math.min(10, Math.max(3, v.length - 1)));
   if (v.length <= 4) return '••••';

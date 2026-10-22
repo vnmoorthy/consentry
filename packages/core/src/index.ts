@@ -14,3 +14,4 @@ export * from './runtime';
 export * from './redteam';
 export * from './tools';
 export * from './store';
+export * from './footprint';
