@@ -39,6 +39,7 @@ export const geocodePlace: ToolDef = {
   recipientId: 'open-meteo',
   purpose: 'lookup',
   endpoint: 'geocoding-api.open-meteo.com/v1/search',
+  limits: 'Picks the best-known match, so an ambiguous place name can land in the wrong spot.',
   requiredArgs: ['query'],
   inputSchema: { type: 'object', properties: { query: { type: 'string', description: 'Place name, e.g. "Yosemite"' }, region_hint: { type: 'string', description: 'Optional state/country to prefer, e.g. "California"' } }, required: ['query'] },
   async run(args, ctx) {
@@ -66,6 +67,7 @@ export const weatherForecast: ToolDef = {
   recipientId: 'open-meteo',
   purpose: 'lookup',
   endpoint: 'api.open-meteo.com/v1/forecast',
+  limits: 'A model forecast on a roughly 11 km grid; less reliable beyond 3 days.',
   requiredArgs: ['location'],
   inputSchema: { type: 'object', properties: { location: locationProp }, required: ['location'] },
   async run(args, ctx) {
@@ -93,6 +95,7 @@ export const airQuality: ToolDef = {
   recipientId: 'open-meteo',
   purpose: 'lookup',
   endpoint: 'air-quality-api.open-meteo.com/v1/air-quality',
+  limits: 'Modeled, not measured by a nearby sensor, so local smoke can differ.',
   requiredArgs: ['location'],
   inputSchema: { type: 'object', properties: { location: locationProp }, required: ['location'] },
   async run(args, ctx) {
@@ -130,6 +133,7 @@ export const weatherAlerts: ToolDef = {
   recipientId: 'nws',
   purpose: 'safety',
   endpoint: 'api.weather.gov/alerts/active',
+  limits: 'US only, and only once a forecast office issues an alert.',
   requiredArgs: ['location'],
   inputSchema: { type: 'object', properties: { location: locationProp }, required: ['location'] },
   async run(args, ctx) {
@@ -148,6 +152,7 @@ export const earthquakes: ToolDef = {
   recipientId: 'usgs',
   purpose: 'safety',
   endpoint: 'earthquake.usgs.gov/fdsnws/event/1/query',
+  limits: 'Magnitudes are preliminary and often revised in the first hours.',
   requiredArgs: ['location'],
   inputSchema: { type: 'object', properties: { location: locationProp, radius_km: { type: 'number', description: 'Default 150' }, days: { type: 'number', description: 'Default 30' }, min_magnitude: { type: 'number', description: 'Default 2.5' } }, required: ['location'] },
   async run(args, ctx) {
@@ -168,6 +173,7 @@ export const decodeVin: ToolDef = {
   recipientId: 'nhtsa',
   purpose: 'safety',
   endpoint: 'vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues',
+  limits: 'Built from manufacturer filings, so trim details can be missing.',
   requiredArgs: ['vin'],
   inputSchema: { type: 'object', properties: { vin: { type: 'string', description: 'VIN, or the vault token {{vault:car_vin}}' } }, required: ['vin'] },
   async run(args, ctx) {
@@ -187,6 +193,7 @@ export const vehicleRecalls: ToolDef = {
   recipientId: 'nhtsa',
   purpose: 'safety',
   endpoint: 'api.nhtsa.gov/recalls/recallsByVehicle',
+  limits: "Listed by make, model and year, so it can't tell whether this car was already repaired.",
   requiredArgs: ['make', 'model', 'year'],
   inputSchema: { type: 'object', properties: { make: { type: 'string' }, model: { type: 'string' }, year: { type: 'string' } }, required: ['make', 'model', 'year'] },
   async run(args, ctx) {
@@ -206,6 +213,7 @@ export const drugRecalls: ToolDef = {
   recipientId: 'openfda',
   purpose: 'safety',
   endpoint: 'api.fda.gov/drug/enforcement.json',
+  limits: 'Reports can lag by weeks and match on drug name, not your exact lot.',
   requiredArgs: ['drug'],
   inputSchema: { type: 'object', properties: { drug: { type: 'string', description: 'Generic drug name, e.g. "albuterol"' } }, required: ['drug'] },
   async run(args, ctx) {
@@ -226,6 +234,7 @@ export const drugLabel: ToolDef = {
   recipientId: 'openfda',
   purpose: 'safety',
   endpoint: 'api.fda.gov/drug/label.json',
+  limits: 'Manufacturer text, not medical advice.',
   requiredArgs: ['drug'],
   inputSchema: { type: 'object', properties: { drug: { type: 'string' } }, required: ['drug'] },
   async run(args, ctx) {
@@ -246,6 +255,7 @@ export const foodRecalls: ToolDef = {
   recipientId: 'openfda',
   purpose: 'safety',
   endpoint: 'api.fda.gov/food/enforcement.json',
+  limits: 'Reports can lag by weeks; check the lot number on the package.',
   requiredArgs: ['term'],
   inputSchema: { type: 'object', properties: { term: { type: 'string', description: 'Allergen or contaminant, e.g. "peanut", "listeria"' } }, required: ['term'] },
   async run(args, ctx) {
@@ -265,6 +275,7 @@ export const disasterDeclarations: ToolDef = {
   recipientId: 'fema',
   purpose: 'safety',
   endpoint: 'www.fema.gov/api/open/v2/DisasterDeclarationsSummaries',
+  limits: 'Federally declared disasters only, usually days after the event.',
   requiredArgs: ['state'],
   inputSchema: { type: 'object', properties: { state: { type: 'string', description: 'Two-letter state code, e.g. "CA"' } }, required: ['state'] },
   async run(args, ctx) {
@@ -284,6 +295,7 @@ export const wikiSummary: ToolDef = {
   recipientId: 'wikipedia',
   purpose: 'lookup',
   endpoint: 'en.wikipedia.org/api/rest_v1/page/summary',
+  limits: 'Crowd-edited and can be out of date.',
   requiredArgs: ['topic'],
   inputSchema: { type: 'object', properties: { topic: { type: 'string' } }, required: ['topic'] },
   async run(args, ctx) {

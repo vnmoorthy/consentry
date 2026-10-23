@@ -10,3 +10,6 @@ assets/video/
 .claude/
 deck/src/media/demo.gif
 deck/src/node_modules/
+video/input/
+video/build/
+video/output/

@@ -1,5 +1,5 @@
 import type { ChatTurn, EgressResult, IngressResult, LedgerEntry, Recipient, VaultItem, Verdict } from './types';
-import { aqiCategory } from './tools/public';
+import { aqiCategory, PUBLIC_TOOLS } from './tools/public';
 import { CATEGORIES } from './taxonomy';
 import { haversineKm } from './util';
 
@@ -116,6 +116,12 @@ function blockedLine(o: ToolOutcome, what: string) {
   return `🛡️ **${what}** — Consentry blocked this call: ${o.reason ?? 'withheld by your policy'}.`;
 }
 
+/** Public data is only as good as its source: say what it can't tell you. */
+function limitsNote(used: Set<string>) {
+  const notes = PUBLIC_TOOLS.filter((t) => used.has(t.name) && t.limits && t.name !== 'geocode_place').slice(0, 3);
+  return notes.length ? `\n\nℹ️ **Data limits**\n${notes.map((t) => `- *${t.title}:* ${t.limits}`).join('\n')}` : '';
+}
+
 function privacyFooter(lines: string[]) {
   return lines.length ? `\n\n---\n🔒 **What left your device:** ${lines.join(' · ')}` : '';
 }
@@ -129,7 +135,16 @@ function disclosure(o: ToolOutcome, recipient: string): string | null {
   return `${recipient}: ${[...new Set(parts)].join(', ')}`;
 }
 
-export async function autopilot(prompt: string, env: AgentEnv): Promise<string> {
+export async function autopilot(prompt: string, agentEnv: AgentEnv): Promise<string> {
+  const used = new Set<string>();
+  const env: AgentEnv = {
+    ...agentEnv,
+    callTool: async (name, args) => {
+      const o = await agentEnv.callTool(name, args);
+      if (o.ok) used.add(name);
+      return o;
+    },
+  };
   const intent = detectIntent(prompt);
   const v = env.vault;
   const sections: string[] = [];
@@ -457,5 +472,5 @@ export async function autopilot(prompt: string, env: AgentEnv): Promise<string> 
       '- "Any earthquakes near me this month?" · "What have you shared about me?"',
     ].join('\n');
   }
-  return sections.join('\n\n') + privacyFooter([...new Set(footer.filter(Boolean))]);
+  return sections.join('\n\n') + limitsNote(used) + privacyFooter([...new Set(footer.filter(Boolean))]);
 }

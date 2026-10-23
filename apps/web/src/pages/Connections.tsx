@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { Check, Copy, Plug, RefreshCw, Terminal } from 'lucide-react';
+import { Check, Copy, Info, Plug, RefreshCw, Terminal } from 'lucide-react';
 import { TIERS, type Tier } from '@consentry/core';
 import { useApp } from '../lib/store';
 import type { HealthMap } from '../lib/client';
@@ -119,6 +119,16 @@ export default function Connections() {
                                 <span className="truncate font-mono text-[10.5px] text-ink-500">{t.name}</span>
                                 {t.calls > 0 && <span className="ml-auto shrink-0 text-[10.5px] text-mint">{t.calls} call{t.calls > 1 ? 's' : ''}</span>}
                               </div>
+                            ))}
+                          </div>
+                        )}
+                        {rtools.some((t) => t.limits) && (
+                          <div className="mt-3 rounded-xl border border-amber-300/15 bg-amber-300/[0.04] p-2.5 text-[11.5px] leading-snug text-ink-300" data-demo="limits">
+                            <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-200/90">
+                              <Info size={12} /> Known limits
+                            </div>
+                            {[...new Set(rtools.map((t) => t.limits).filter(Boolean))].map((l) => (
+                              <div key={l}>{l}</div>
                             ))}
                           </div>
                         )}

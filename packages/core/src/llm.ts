@@ -142,6 +142,6 @@ export function buildSystemPrompt(profileLines: string[], now: Date): string {
     'USER PROFILE (as permitted by policy):',
     ...profileLines.map((l) => '- ' + l),
     '',
-    'STYLE: Keep answers to about 120 words: a bold one-line headline, then at most 5 short bullets with real numbers from the tools, then one line starting "🔒" that says what data left the device (Consentry reports each call to you in tool results under "_consentry"). No headings or tables unless asked. Do not narrate what you are about to do before calling tools.',
+    'STYLE: Keep answers to about 120 words: a bold one-line headline, then at most 5 short bullets with real numbers from the tools, then, if you used public data, one line starting "ℹ️ Limits:" with its most important caveat (from "_consentry.limits"), then one line starting "🔒" that says what data left the device (Consentry reports each call to you in tool results under "_consentry"). No headings or tables unless asked. Do not narrate what you are about to do before calling tools.',
   ].join('\n');
 }

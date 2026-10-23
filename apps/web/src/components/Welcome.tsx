@@ -33,6 +33,12 @@ export function Welcome() {
     setOpen(false);
     if (tour) setTimeout(openTour, 450);
   };
+  // The product video ends on the splash (scripts/video/record.ts).
+  useEffect(() => {
+    const h = () => setOpen(true);
+    window.addEventListener('consentry:welcome', h);
+    return () => window.removeEventListener('consentry:welcome', h);
+  }, []);
   useEffect(() => {
     if (!open) return;
     const h = (e: KeyboardEvent) => e.key === 'Escape' && close();

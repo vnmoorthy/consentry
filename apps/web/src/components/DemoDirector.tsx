@@ -119,6 +119,15 @@ export function DemoDirector() {
     setI(next);
     if (loc.pathname !== chapters[next].path) nav(chapters[next].path);
   };
+  // Hidden while recording the product video (set by scripts/video/record.ts).
+  const recording = (() => {
+    try {
+      return localStorage.getItem('consentry:recording') === '1';
+    } catch {
+      return false;
+    }
+  })();
+  if (recording) return null;
   const actionLabel = ch.prompt ? 'Run this scenario' : ch.click ? 'Launch it' : ch.receipt ? 'Open latest receipt' : loc.pathname === ch.path ? 'You’re here' : 'Take me there';
 
   return (

@@ -93,12 +93,12 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
           </NavLink>
         ))}
       </nav>
-      <div className="space-y-3 p-4">
+      <div className="sidebar-foot space-y-3 p-4">
         <div className="panel flex items-center gap-3 p-3">
           <ScoreRing value={snap?.privacyScore ?? 100} size={46} stroke={4} />
           <div className="min-w-0">
             <div className="text-[12px] font-semibold text-white">Privacy score</div>
-            <div className="text-[10.5px] leading-snug text-ink-400">How little of your data left, weighted by sensitivity</div>
+            <div className="score-desc text-[10.5px] leading-snug text-ink-400">How little of your data left, weighted by sensitivity</div>
           </div>
         </div>
         <div className="panel space-y-2 p-3 text-[11.5px]">
@@ -122,7 +122,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
             </div>
           )}
         </div>
-        <a href={REPO_URL} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-1 text-[11.5px] text-ink-400 hover:text-white">
+        <a href={REPO_URL} target="_blank" rel="noreferrer" className="sidebar-repo flex items-center gap-2 px-1 text-[11.5px] text-ink-400 hover:text-white">
           <GithubIcon size={14} /> vnmoorthy/consentry
         </a>
       </div>

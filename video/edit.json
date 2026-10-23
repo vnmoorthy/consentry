@@ -1,0 +1,114 @@
+{
+  "comment": "Edit decisions for video/input/Product Demo Video.mov. Times are source seconds; timeline.ts snaps each cut to the quietest 10 ms within \u00b10.12 s.",
+  "cuts": [
+    {
+      "from": 174.25,
+      "to": 174.9,
+      "why": "'So,' before 'and every time she gets a receipt'"
+    },
+    {
+      "from": 176.8,
+      "to": 177.74,
+      "win": 0.03,
+      "why": "'of whatever is going on.' (cut ends where 'What's' starts)"
+    },
+    {
+      "from": 218.9,
+      "to": 220.3,
+      "why": "'hidden structures,' (kept 'hidden instructions')"
+    },
+    {
+      "from": 240.07,
+      "to": 242.0,
+      "why": "'Don't trust us? Maybe' (kept 'you don't have to trust us')"
+    },
+    {
+      "from": 261.62,
+      "to": 263.23,
+      "why": "'Okay? Then that's, that's' stutter"
+    },
+    {
+      "from": 287.99,
+      "to": 288.45,
+      "why": "'what.' after 'actually gets' (kept the pause)"
+    },
+    {
+      "from": 307.38,
+      "to": 309.41,
+      "why": "'a hit-ton or' before 'plain HTTP gateway'"
+    },
+    {
+      "from": 59.85,
+      "to": 60.94,
+      "win": 0.06,
+      "why": "spoken title 'Real public data?'"
+    },
+    {
+      "from": 152.3,
+      "to": 154.85,
+      "win": 0.08,
+      "why": "spoken title 'So exact address, it's her call.'"
+    }
+  ],
+  "spelling": [
+    [
+      "concentrate",
+      "Consentry"
+    ],
+    [
+      "concentree",
+      "Consentry"
+    ],
+    [
+      "concentry",
+      "Consentry"
+    ],
+    [
+      "konstantri",
+      "Consentry"
+    ],
+    [
+      "rideknow",
+      "RideNow"
+    ],
+    [
+      "cursor",
+      "Cursor"
+    ]
+  ],
+  "phrases": [
+    [
+      [
+        "card",
+        "code"
+      ],
+      [
+        "Claude",
+        "Code"
+      ]
+    ],
+    [
+      [
+        "cloud",
+        "desktop"
+      ],
+      [
+        "Claude",
+        "Desktop"
+      ]
+    ]
+  ],
+  "captionSkip": [
+    [
+      272.1,
+      272.86,
+      "'by and' in 'by whom and by and why' (no clean audio cut)"
+    ]
+  ],
+  "speed": 1.08,
+  "tightenPauses": {
+    "longerThan": 0.4,
+    "keep": 0.22,
+    "aboveFloorDb": 10
+  }
+}

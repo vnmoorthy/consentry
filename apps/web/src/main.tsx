@@ -15,6 +15,13 @@ import Connections from './pages/Connections';
 import RedTeam from './pages/RedTeam';
 import Settings from './pages/Settings';
 
+// Recording mode for the product video: frees the sidebar's bottom-left corner for the webcam circle.
+try {
+  if (localStorage.getItem('consentry:recording') === '1') document.documentElement.classList.add('recording');
+} catch {
+  /* storage blocked */
+}
+
 function Boot() {
   const init = useApp((s) => s.init);
   const snap = useApp((s) => s.snap);

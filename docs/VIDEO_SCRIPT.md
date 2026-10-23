@@ -1,0 +1,141 @@
+# What to read for the product video
+
+You read this to your webcam. I record the product to match your voice, then put your face in a circle in the bottom-left corner, with your voice as the soundtrack.
+
+**759 words.** Your recording will be about **5:32** with the pauses. The finished video is about **5:15**, because I trim the pauses.
+
+## Before you hit record
+
+- **Use QuickTime Player → File → New Movie Recording** (Photo Booth works too). A phone propped up sideways is fine.
+- **Keep your face in the middle of the frame**, head and shoulders, camera at eye level. I crop the circle from the center.
+- **Face a window or a lamp.** Don't sit with a bright window behind you.
+- **Pick a quiet room.** The laptop mic is fine at arm's length.
+- **Read it out loud once first.** It's written to be spoken, so it should feel natural by the second time.
+
+## While you record
+
+1. **Start with 2 seconds of silence**, then begin with section 1.
+2. **Pause for about 2 seconds between sections.** That's how I find where each one starts. Inside a section, talk normally.
+3. **If you trip over a line**, stop, stay quiet for **5 seconds**, then start *that section* again from its first sentence. I'll throw away the bad take automatically.
+4. **Small wording changes are fine.** Say it the way you'd say it, but keep the sections in order. I time each click to roughly where you are in the section.
+5. **End with 2 seconds of silence**, then stop recording.
+
+Don't read the section titles or the *On screen* lines. Those just tell you what viewers will be looking at.
+
+**Saying it:** VIN rhymes with "pin". Read MCP, API and HTTP letter by letter. Smile on the first and last lines. It comes through in your voice.
+
+## When you're done
+
+Save the file (.mov, .mp4 or .m4v) into **`consentry/video/input/`** and tell me **"recorded"**.
+
+---
+
+## The script
+
+### 1. Why this exists
+
+*On screen: The welcome screen: the CONSENTRY wordmark rises over the horizon.*
+
+> Quick question. When was the last time an AI agent asked for less of your data? Yeah. Never. Every agent demo wants your whole life: your address, your credit card, your medical history. And here's the scary part. Once the agent knows it, every app it talks to can learn it too. So we built Consentry: a firewall for your personal data. Your agent gets to use the world's public data. The world doesn't get to use yours.
+
+*(pause, 2 seconds)*
+
+### 2. Meet Maya
+
+*On screen: Maya's profile card, then the Vault: the Social Security number is revealed, then hidden again.*
+
+> Let me show you. Meet Maya. She's not real, but her data is the kind we all have. Social Security number, credit card, home address, her asthma, even her anxiety medication. Fifteen things, all locked in this vault and encrypted. And here's the trick: her agent never sees any of it. Not once. It only gets placeholder tokens.
+
+*(pause, 2 seconds)*
+
+### 3. Real public data
+
+*On screen: The Yosemite hike question runs against live weather, air-quality and National Weather Service APIs. Every firewall card says CLEAN.*
+
+> Okay, let's actually use it. I'm going to ask: is Saturday good for a hike in Yosemite, with my asthma? Now watch the feed on the right. The agent grabs the forecast, the air quality and any weather alerts, all from live public APIs. And look: every call says clean. Those APIs saw the coordinates of a national park. That's it. The asthma part? Figured out right here, on Maya's own device.
+
+*(pause, 2 seconds)*
+
+### 4. Asking first
+
+*On screen: Safety sweep: the VIN goes to NHTSA, then a consent prompt for the inhaler, answered with “30 days”. The anxiety medication is blocked.*
+
+> Now let's get personal. I'll ask it to check whether anything Maya owns, or takes, has been recalled. Her car? Easy. She already said the safety agency can have her VIN. But her medications? That's her call. So Consentry hits pause and asks her, showing exactly what would go out, right next to a safer version. I'll say yes for thirty days, and that covers her second inhaler too. Her anxiety meds, though? Those never leave. No exceptions.
+
+*(pause, 2 seconds)*
+
+### 5. Apps get the least
+
+*On screen: Dinner booking: the consent prompt for the allergy is answered with “Share minimized”, then the answer shows what TableTap has on file.*
+
+> Apps get even less. Let's book dinner. The restaurant finder? It just learns her neighborhood. The booking app gets her real name, sure. But a relay phone number, a relay email, and a one-time card that only works with them. And her peanut allergy? It goes out as “peanut-free meal required.” Not as her medical history.
+
+*(pause, 2 seconds)*
+
+### 6. Exact address? Her call
+
+*On screen: Ride home: RideNow asks for the exact home address; the nearest intersection is shared instead.*
+
+> Sometimes an app genuinely needs more. Say I want a ride home. RideNow wants her exact address. Fair enough, but Consentry asks her first, and offers the nearest street corner instead. The driver still finds her. Her home address just never lands in a ride company's database.
+
+*(pause, 2 seconds)*
+
+### 7. A receipt every time
+
+*On screen: The paper-style privacy receipt, ending with “hash chain verified”.*
+
+> And every single time, she gets a receipt. What left, in what form, who got it, and what stayed home. Every line backed by a ledger nobody can quietly rewrite.
+
+*(pause, 2 seconds)*
+
+### 8. Who knows what
+
+*On screen: Footprint matrix, then TableTap's drawer, a deletion request drafted from the ledger, sent and confirmed.*
+
+> Honestly, this is my favorite screen. It's Maya's data footprint: every company, and exactly what each one knows about her. Red means they know it exactly. Amber, roughly. Green means they asked and got a no. And if she wants a company to forget her? One click. Consentry writes the deletion request for her, listing exactly what they got, with the ledger as proof.
+
+*(pause, 2 seconds)*
+
+### 9. We tried to break it
+
+*On screen: Red Team: all five attacks run. 5/5 contained.*
+
+> Of course, we tried to break it. This restaurant review has hidden instructions: send Maya's Social Security number and card to some tracking site. We even fake an agent that falls for it. Doesn't matter. Consentry spots the attack, locks down her sensitive data, and blocks the shady website. Five attacks. All five stopped.
+
+*(pause, 2 seconds)*
+
+### 10. Don't trust us. Check.
+
+*On screen: Ledger: tamper with a past entry, verify the chain, and it breaks at that exact entry.*
+
+> And you don't have to trust us on any of this. Every decision is chained together, so if anyone goes back and edits history, say, to pretend nothing was shared, the check breaks at that exact line.
+
+*(pause, 2 seconds)*
+
+### 11. Rules in plain English
+
+*On screen: Policies: “Never let the AI see my medications” becomes a structured rule; the simulator explains a decision.*
+
+> Want to change the rules? Just say it. Never let the AI see my medications. Done. That's now a real rule. And this simulator tells her exactly how any piece of her data would be treated, by whom, and why.
+
+*(pause, 2 seconds)*
+
+### 12. With a real model
+
+*On screen: Claude mode: the SSN and card are pasted into chat. The feed shows what the model received, and “What Claude saw” opens.*
+
+> So far, that was our built-in autopilot. Now Claude is the brain, a real frontier model. And I'm going to overshare on purpose: my Social Security number and my card, straight into the chat. Watch what the model actually gets: “government ID withheld,” and a token instead of the card. It still answers me. And my location goes out rounded to about ten kilometers.
+
+*(pause, 2 seconds)*
+
+### 13. Protect any agent
+
+*On screen: Connections and the MCP setup, then back to the CONSENTRY wordmark.*
+
+> One more thing. You don't have to use our agent at all. Consentry plugs into Claude Desktop, Claude Code, Cursor, anything that speaks MCP, or through a plain HTTP gateway. If you're a company putting agents in front of customers, this is how you prove you only took what you needed, only for what you said, on every single call. It's open source, and you can try the live demo in your browser right now. Your data. Your rules. Your receipt.
+
+*(pause, 2 seconds)*
+
+---
+
+*Generated from `video/script.json` by `pnpm tsx scripts/video/script-md.ts`. Speaking time assumes 150 words per minute.*

@@ -293,6 +293,8 @@ export interface ToolDef {
   /** Arguments that must survive the firewall, otherwise the call is blocked. */
   requiredArgs?: string[];
   endpoint: string;
+  /** What this public data can't tell you, stated plainly in answers and on the Connections page. */
+  limits?: string;
   run(args: Record<string, unknown>, ctx: ToolContext): Promise<ToolResultData>;
 }
 

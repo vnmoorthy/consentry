@@ -176,3 +176,21 @@ describe('footprint & deletion requests', () => {
     await expect(rt.draftDeletion('openfda')).rejects.toThrow(/nothing to delete/);
   });
 });
+
+describe('public data limits', () => {
+  it('every public API states what it cannot tell you', async () => {
+    const { PUBLIC_TOOLS } = await import('../src/tools/public');
+    const missing = PUBLIC_TOOLS.filter((t) => t.name !== 'http_fetch' && !t.limits).map((t) => t.name);
+    expect(missing).toEqual([]);
+  });
+
+  it('answers that used public data end with its limits', async () => {
+    const { autopilot } = await import('../src/planner');
+    const answer = await autopilot('Tell me about Yosemite National Park', {
+      runId: 'r1', now: new Date(), vault, recipients, history: [], ledger: [], compromised: false, step: () => {},
+      callTool: async () => ({ ok: true, blocked: false, verdict: 'clean', data: { title: 'Yosemite National Park', extract: 'A national park in California.' }, egress: { decisions: [] } as any }),
+    });
+    expect(answer).toMatch(/Data limits/);
+    expect(answer).toMatch(/crowd-edited/i);
+  });
+});

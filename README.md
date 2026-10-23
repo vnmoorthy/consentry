@@ -14,7 +14,7 @@
   <img alt="MIT" src="https://img.shields.io/badge/license-MIT-34d399?labelColor=0b0d14" />
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-60a5fa?labelColor=0b0d14" />
   <img alt="MCP" src="https://img.shields.io/badge/MCP-server-c4b5fd?labelColor=0b0d14" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-16_passing-34d399?labelColor=0b0d14" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-18_passing-34d399?labelColor=0b0d14" />
   <img alt="Red team" src="https://img.shields.io/badge/red_team-5%2F5_contained-fb7185?labelColor=0b0d14" />
   <img alt="Runs offline" src="https://img.shields.io/badge/LLM-optional-8a93ad?labelColor=0b0d14" />
 </p>
@@ -257,20 +257,22 @@ Every scenario runs through the real runtime, firewall, tools and ledger. Run th
 
 No keys and no accounts. Every call goes through the firewall, which is why account-less public APIs only ever get a coarsened location.
 
-| API | Used for | Recipient tier |
-|---|---|---|
-| [Open-Meteo Forecast](https://open-meteo.com/) | 7-day forecast, current conditions | Open data |
-| [Open-Meteo Air Quality](https://open-meteo.com/en/docs/air-quality-api) | US AQI, PM2.5, ozone, 3-day outlook | Open data |
-| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | Place → coordinates | Open data |
-| [National Weather Service](https://www.weather.gov/documentation/services-web-api) | Active alerts | Public sector |
-| [USGS Earthquakes](https://earthquake.usgs.gov/fdsnws/event/1/) | Quakes near you | Public sector |
-| [NHTSA vPIC](https://vpic.nhtsa.dot.gov/api/) | VIN decoding | Public sector |
-| [NHTSA Recalls](https://www.nhtsa.gov/nhtsa-datasets-and-apis) | Vehicle safety recalls | Public sector |
-| [openFDA Drug Enforcement](https://open.fda.gov/apis/drug/enforcement/) | Drug recalls | Public sector |
-| [openFDA Drug Label](https://open.fda.gov/apis/drug/label/) | Warnings & interactions | Public sector |
-| [openFDA Food Enforcement](https://open.fda.gov/apis/food/enforcement/) | Allergen recalls | Public sector |
-| [OpenFEMA](https://www.fema.gov/about/openfema/api) | Disaster declarations | Public sector |
-| [Wikipedia REST](https://en.wikipedia.org/api/rest_v1/) | Encyclopedia lookups | Open data |
+Public data is real but imperfect, so Consentry says what each source can't tell you: every answer that used public data ends with a **Data limits** note, Claude is handed the same caveats in its tool results, and the Connections page lists them per source.
+
+| API | Used for | Recipient tier | Known limits |
+|---|---|---|---|
+| [Open-Meteo Forecast](https://open-meteo.com/) | 7-day forecast, current conditions | Open data | Model forecast on a ~11 km grid; less reliable beyond 3 days |
+| [Open-Meteo Air Quality](https://open-meteo.com/en/docs/air-quality-api) | US AQI, PM2.5, ozone, 3-day outlook | Open data | Modeled, not a nearby sensor reading; local smoke can differ |
+| [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) | Place → coordinates | Open data | Best-known match; ambiguous names can land in the wrong spot |
+| [National Weather Service](https://www.weather.gov/documentation/services-web-api) | Active alerts | Public sector | US only; an alert exists only once a forecast office issues it |
+| [USGS Earthquakes](https://earthquake.usgs.gov/fdsnws/event/1/) | Quakes near you | Public sector | Magnitudes are preliminary and often revised |
+| [NHTSA vPIC](https://vpic.nhtsa.dot.gov/api/) | VIN decoding | Public sector | Built from manufacturer filings; trim details can be missing |
+| [NHTSA Recalls](https://www.nhtsa.gov/nhtsa-datasets-and-apis) | Vehicle safety recalls | Public sector | By make/model/year: can't tell whether *this* car was already repaired |
+| [openFDA Drug Enforcement](https://open.fda.gov/apis/drug/enforcement/) | Drug recalls | Public sector | Reports lag by weeks; matches drug name, not your lot |
+| [openFDA Drug Label](https://open.fda.gov/apis/drug/label/) | Warnings & interactions | Public sector | Manufacturer text, not medical advice |
+| [openFDA Food Enforcement](https://open.fda.gov/apis/food/enforcement/) | Allergen recalls | Public sector | Reports lag by weeks; check the lot on the package |
+| [OpenFEMA](https://www.fema.gov/about/openfema/api) | Disaster declarations | Public sector | Federally declared disasters only, usually days after the event |
+| [Wikipedia REST](https://en.wikipedia.org/api/rest_v1/) | Encyclopedia lookups | Open data | Crowd-edited and can be out of date |
 
 Commercial partners (BiteFinder, TableTap, RideNow, MediMart, QuickQuote) are **simulated locally** and labeled as such in the UI, so the demo can show hostile behavior safely and deterministically.
 

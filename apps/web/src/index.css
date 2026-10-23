@@ -363,3 +363,15 @@ select.input option {
   letter-spacing: 0.32em;
   text-transform: uppercase;
 }
+
+/* Recording mode (scripts/video/record.ts): the presenter's webcam circle sits in the bottom-left corner. */
+.recording .sidebar-foot {
+  padding-bottom: 256px;
+}
+.recording .sidebar-repo,
+.recording .score-desc {
+  display: none;
+}
+.recording ::-webkit-scrollbar {
+  display: none;
+}
